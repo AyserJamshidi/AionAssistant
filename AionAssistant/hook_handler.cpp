@@ -79,8 +79,6 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 }
 
 DWORD WINAPI DirectXInit(__in  LPVOID lpParameter) {
-	oWndProc = (WNDPROC)SetWindowLongPtr(window, GWL_WNDPROC, (LONG_PTR)WndProc);
-
 	IDirect3D9* pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (pD3D == NULL) {
 		std::cout << "Failed to create D3D interface." << std::endl;
@@ -117,6 +115,9 @@ DWORD WINAPI DirectXInit(__in  LPVOID lpParameter) {
 	if (MH_CreateHook((DWORD_PTR*)pTable[42], &hkEndScene, reinterpret_cast<void**>(&oEndScene)) != MH_OK) { return 1; }
 	if (MH_EnableHook((DWORD_PTR*)pTable[42]) != MH_OK) { return 1; }
 	//82 == DrawIndexedPrimitive
+
+	// GWL_WNDPROC == x86, GWLP_WNDPROC == x64
+	oWndProc = (WNDPROC)SetWindowLongPtr(window, -4, (LONG_PTR)WndProc);
 
 	std::cout << "Successfully hooked." << std::endl;
 
