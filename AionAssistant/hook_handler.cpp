@@ -19,22 +19,22 @@ typedef HRESULT(APIENTRY* Reset) (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 typedef HRESULT(APIENTRY* EndScene) (IDirect3DDevice9*);
 typedef LRESULT(CALLBACK* WNDPROC) (HWND, UINT, WPARAM, LPARAM);
 
-WNDPROC oWndProc;
-
 HRESULT APIENTRY hkReset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 HRESULT APIENTRY hkEndScene(IDirect3DDevice9*);
 
-Reset oReset = FALSE;
-EndScene oEndScene = FALSE;	
+Reset oReset;
+EndScene oEndScene;
+WNDPROC oWndProc;
 
-HWND winHandle = FindWindowA(NULL, "DirectX 9 Test Environment");
+DWORD_PTR* pTable;
+
+IDirect3D9* pD3D;
+IDirect3DDevice9* d3dDevice;
+HMODULE dllModule;
+
+HWND winHandle = FindWindowA(NULL, "Test Environment - Engine: DirectX 9 - Made by TheAifam5");
 
 DWORD processId;
-
-DWORD* pTable = NULL;
-IDirect3D9* pD3D = NULL;
-IDirect3DDevice9* d3dDevice = NULL;
-HMODULE dllModule;
 
 BOOL showD3D = TRUE;
 
@@ -49,8 +49,10 @@ HRESULT __stdcall hkReset(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pPre
 void Eject() {
 	showD3D = FALSE;
 
-	if (MH_RemoveHook(MH_ALL_HOOKS) != MH_OK) { std::cout << "Couldn't remove hook 1."; }
-	if (MH_Uninitialize() != MH_OK) { std::cout << "Couldn't remove hook 2."; }
+	/*if (MH_DisableHook((DWORD_PTR*)pTable[16])) { std::cout << "Couldn't remove hook 0."; }
+	if (MH_RemoveHook((DWORD_PTR*)pTable[16]) != MH_OK) { std::cout << "Couldn't remove hook 1."; }
+	if (MH_RemoveHook((DWORD_PTR*)pTable[42]) != MH_OK) { std::cout << "Couldn't remove hook 2."; }*/
+	if (MH_Uninitialize() != MH_OK) { std::cout << "MinHook failed to uninitialize."; }
 
 	// Clear vars
 	oEndScene = NULL;
@@ -58,25 +60,27 @@ void Eject() {
 	d3dDevice = NULL;
 	pD3D->Release();
 	pD3D = NULL;
+	pTable = NULL;
 
-	SetWindowLongPtrA(winHandle, GWLP_WNDPROC, LONG_PTR(oWndProc));
-	// We acquire the console's HANDLE before freeing as we will receive NULL if we attempt it afterwards.
-	HWND console = GetConsoleWindow();
+	SetWindowLongPtrW(winHandle, -4, LONG_PTR(oWndProc)); // Restore the window pointer.0
+
+	HWND console = GetConsoleWindow();// We acquire the console's HANDLE before freeing as we will receive NULL if we attempt it afterwards.
 	FreeConsole(); // Free the console.
-	Sleep(300); // Without this sleep the close message sometimes closes the main window...
+	Sleep(200); // Without this sleep the close message sometimes closes the main window...
 	SendMessage(console, WM_CLOSE, NULL, NULL); // Send console window handle the close message.
 	FreeLibraryAndExitThread(dllModule, 0);
-
 }
 
+bool firstEndSceneLoop = true;
 HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
 	//LPDIRECT3DSTATEBLOCK9 oStateBlock; // Keep so Aion doesn't look weird when D3D Transparency is up
 	//pDevice->CreateStateBlock(D3DSBT_ALL, &oStateBlock); // Keep so Aion doesn't look weird when D3D Transparency is up
-	
-	static bool init = true;
-	if (init) {
-		init = false;
+
+	if (firstEndSceneLoop) {
+		firstEndSceneLoop = false;
 		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 
 		ImGui_ImplWin32_Init(winHandle);
 		ImGui_ImplDX9_Init(pDevice);
@@ -95,7 +99,6 @@ HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
 
 	ImGui::EndFrame();
 	ImGui::Render();
-
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	//pDevice->EndScene(); //Call the EndScene function with our Device
 
@@ -106,7 +109,7 @@ HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
 }
 
 LRESULT CALLBACK WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam) && showD3D) {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) {
 		return true;
 	}
 
@@ -119,6 +122,7 @@ DWORD WINAPI DirectXInit(__in  LPVOID lpParameter) {
 	pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (pD3D == NULL) {
 		std::cout << "Failed to create D3D interface." << std::endl;
+		Eject();
 		return -1;
 	}
 
@@ -127,17 +131,12 @@ DWORD WINAPI DirectXInit(__in  LPVOID lpParameter) {
 
 	if (FAILED(pD3D->CreateDevice(0, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d3dDevice))) {
 		std::cout << "Failed to create D3D device." << std::endl;
-		pD3D->Release();
+		Eject();
 		return -1;
 	}
 
-#if defined _M_X64
-	DWORD64* pTable = (DWORD64*)d3dDevice;
-	pTable = (DWORD64*)pTable[0];
-#else
-	pTable = (DWORD*)d3dDevice;
-	pTable = (DWORD*)pTable[0];
-#endif
+pTable = (DWORD_PTR*)d3dDevice;
+pTable = (DWORD_PTR*)pTable[0];
 
 	if (d3dDevice)
 		d3dDevice->Release(), d3dDevice = NULL;
@@ -153,7 +152,7 @@ DWORD WINAPI DirectXInit(__in  LPVOID lpParameter) {
 	//82 == DrawIndexedPrimitive
 
 	// GWL_WNDPROC == x86, GWLP_WNDPROC == x64, both define to -4...
-	oWndProc = (WNDPROC)SetWindowLongA(winHandle, -4, (LONG_PTR)WndProc);
+	oWndProc = (WNDPROC)SetWindowLongPtrA(winHandle, -4, (LONG_PTR)WndProc);
 
 	std::cout << "Successfully hooked." << std::endl;
 
