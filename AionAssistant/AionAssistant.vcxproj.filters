@@ -30,12 +30,18 @@
     <Filter Include="MinHook\src\HDE">
       <UniqueIdentifier>{d58da725-2388-4052-b2b4-d9e1f006f1ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\model">
+      <UniqueIdentifier>{7e94a265-939c-4876-9e4f-9f648f5215bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\model">
+      <UniqueIdentifier>{28da99c1-57da-4d22-abf2-b0f8859aa15d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assembly">
+      <UniqueIdentifier>{6e8d7aee-6120-4baf-9a4e-f9aed45468e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
@@ -89,16 +95,19 @@
     <ClInclude Include="dllmain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memoryLoop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AttachHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hook_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="memory_loop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Entity.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -124,9 +133,6 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MinHook\src\buffer.c">
       <Filter>MinHook\src</Filter>
     </ClCompile>
@@ -142,9 +148,6 @@
     <ClCompile Include="MinHook\src\HDE\hde64.c">
       <Filter>MinHook\src\HDE</Filter>
     </ClCompile>
-    <ClCompile Include="memoryLoop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AttachHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -154,5 +157,13 @@
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="memory_loop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="Assembly.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
