@@ -19,13 +19,16 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msh, WPARAM wParam
 
 typedef HRESULT(APIENTRY* Reset) (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 typedef HRESULT(APIENTRY* EndScene) (IDirect3DDevice9*);
+typedef HRESULT(APIENTRY* Entity) (int);
 typedef LRESULT(CALLBACK* WNDPROC) (HWND, UINT, WPARAM, LPARAM);
 
 HRESULT APIENTRY hkReset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 HRESULT APIENTRY hkEndScene(IDirect3DDevice9*);
+HRESULT APIENTRY hkEntity(int);
 
 Reset oReset = NULL;
 EndScene oEndScene = NULL;
+Entity oEntity = NULL;
 WNDPROC oWndProc = NULL;
 
 DWORD_PTR* pTable = NULL;
@@ -79,7 +82,7 @@ void Eject() {
 
 bool firstEndSceneLoop = true;
 HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
-	if (showD3D) {
+	/*if (showD3D) {
 		if (firstEndSceneLoop) {
 			firstEndSceneLoop = false;
 			ImGui::CreateContext();
@@ -95,12 +98,6 @@ HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
 		ImGui::NewFrame();
 
 		if (MemLoop::IsInitialized()) {
-			/*char name[64];
-			GetName(name);
-			wchar_t converted[256];
-			MultiByteToWideChar(CP_UTF8, 0, name, -1, converted, IM_ARRAYSIZE(converted));*/
-
-			//ImGui::Text("Hello %s", GetName());
 		}
 
 		if (ImGui::Button("Unload")) {
@@ -115,7 +112,7 @@ HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-	}
+	}*/
 
 	return oEndScene(pDevice);
 }
@@ -227,14 +224,32 @@ DWORD WINAPI DirectXInit(__in  LPVOID lpParameter) {
 	if (MH_EnableHook((DWORD_PTR*)pTable[42]) != MH_OK) { return 1; }
 	//82 == DrawIndexedPrimitive
 
-	// GWL_WNDPROC == x86, GWLP_WNDPROC == x64, both define to -4...
-	//oWndProc = (WNDPROC)SetWindowLongPtrA(winHandle, -4, (LONG_PTR)WndProc);
+	printf("Everything hooked.");
 
-	oWndProc = WNDPROC(SetWindowLongPtr(pHwnd, -4, (LONG_PTR)WndProc));
+	if (MH_CreateHook((LPVOID)0x4C83A0FE, &hkEntity, reinterpret_cast<void**>(&oEntity)) != MH_OK) { return 1; }
+	printf("1pass");
+	Sleep(2000);
+	if (MH_EnableHook((LPVOID)0x4C83A0FE) != MH_OK) { return 1; }
+	printf("2pass");
+	Sleep(2000);
 
-	std::cout << "Successfully hooked." << std::endl;
+	oWndProc = WNDPROC(SetWindowLongPtr(pHwnd, -4 /* GWL_WNDPROC(x86), GWLP_WNDPROC(x86_64) */, (LONG_PTR)WndProc));
+
+	DWORD procId;
+	GetWindowThreadProcessId(pHwnd, &procId);
+	//pHandle = OpenProcess(PROCESS_VM_READ, 0, procId);
+	MemLoop::Initialize(OpenProcess(PROCESS_VM_READ, 0, procId));
+
+	std::cout << "Successful." << std::endl;
 
 	//F1();
 
 	return 1;
+}
+
+HRESULT __stdcall hkEntity(int i) {
+	printf("Inside hkEntity! i = %i", i);
+	//return Entity(i);
+
+	return i;
 }

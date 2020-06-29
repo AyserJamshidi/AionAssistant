@@ -37,7 +37,7 @@ BOOL MemLoop::Initialize(HANDLE givenHandle) {
 		return FALSE;
 	}
 
-	gameDllBaseAddress = (DWORD)GetModuleHandle(L"Game.dll");//dwGetModuleBaseAddress(globalVariables::getProcessID(), L"Game.dll");
+	/*gameDllBaseAddress = (DWORD)GetModuleHandle(L"Game.dll");//dwGetModuleBaseAddress(globalVariables::getProcessID(), L"Game.dll");
 	if (gameDllBaseAddress != NULL) {
 
 		DlgLootOption = gameDllBaseAddress + 0x15314E8;
@@ -47,17 +47,21 @@ BOOL MemLoop::Initialize(HANDLE givenHandle) {
 	} else {
 		// TODO: Error message
 		return FALSE;
-	}
+	}*/
+
+	printf("Initializing...");
 
 	DWORD entityArrAddy = FindPattern("\x48\x8B\x78\x28\x48\x85\xFF", "xxxxxxx");
 	printf("entityArrAddy == %x\n", entityArrAddy);
-	if (entityArrAddy != NULL) {
+	/*if (entityArrAddy != NULL && entityArrAddy == 0x4B75A0FE) {
 		std::cout << "Not null!" << std::endl;
 		DWORD EntlistJmpBack = entityArrAddy + 0x7;
+		printf("Addr == %x", entityArrAddy);
 		PlaceJMP((BYTE*)entityArrAddy, (DWORD)F1);
 	} else {
 		// TODO: Error message
-	}
+		printf("Something went wrong!");
+	}*/
 	return TRUE;
 }
 
