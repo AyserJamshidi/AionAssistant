@@ -23,18 +23,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	return TRUE;
 }*/
 
+#include "dllmain.h"
+
 #include <Windows.h>
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
 
-extern "C" void writei(DWORD_PTR i);
 extern "C" DWORD_PTR jmpBackAddr;
+extern "C" void interceptEntities(DWORD_PTR givenAddress);
 
 DWORD_PTR jmpBackAddr;
 
 extern "C" void AION();
-extern "C" void F1();
 
 void DetourRemove(void* pSource, int dwLen) {
 	int MinLen = 14;
@@ -122,45 +123,50 @@ bool Hook(BYTE* pTarget, BYTE* pHook, UINT Length) {
 	return true;
 }
 
-//int xa = 0;
-void writei( DWORD_PTR i ) {
-	//xa++;
-	std::cout << "Hi! = " << std::hex << i << std::endl;
-	//Sleep(10);
+extern "C" int curNum;
+
+int curNum = 1;
+void interceptEntities(uintptr_t givenAddress) {
+	std::cout << "curNum = " << curNum << " ";
+	curNum++;
+	printf("%I64x\n", givenAddress);
 }
+
 void Blah() {
-	while (!GetModuleHandle(L"CryEntitySystem.dll")) {
-		std::cout << "Waiting for Aion init.";
+	while (!GetModuleHandleW(L"CryEntitySystem.dll")) {
+		printf("Waiting for Aion init.\n");
 		Sleep(100);
 	}
 
-	DWORD_PTR entityHandle = (DWORD_PTR)GetModuleHandle(L"CryEntitySystem.dll");
+	printf("Hooked!\n");
+
+	DWORD_PTR entityHandle = (DWORD_PTR)GetModuleHandleW(L"CryEntitySystem.dll");
 
 	if (entityHandle != NULL) {
 		DWORD_PTR initialAddr = entityHandle + 0x5A107;
 		int byteLength = 16;
-
 		jmpBackAddr = initialAddr + byteLength;
+
 		DetourFunction((LPVOID)(initialAddr), (LPVOID)AION, byteLength);
 	}
-	
-	/*
-	DetourFunction((LPVOID)0x7FF7FDE8319D, (LPVOID)AION, 17);*/
+
+	//DetourFunction((LPVOID)0x7FF67E733070, (LPVOID)AION, 18);
 	//std::cout << "Bool = " << Hook((BYTE*)0x7FFCC361FE38, (BYTE*)AION, 16);
 }
 
 BOOL WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) {
-	switch (fdwReason) {
-	case DLL_PROCESS_ATTACH:
+
+	//DisableThreadLibraryCalls(hModule);
+
+	if (fdwReason == DLL_PROCESS_ATTACH) {
 		AllocConsole();
 		FILE* pCout; // Dummy file so we can properly in/output to console while avoiding security issues from freopen(..).
 		freopen_s(&pCout, "CONOUT$", "w", stdout);
-		
-		std::cout << "Hi!";
 
-		CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Blah, NULL, NULL, NULL);
-		break;
+		HANDLE entityLoopHandle = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Blah, 0, 0, 0);
+
+		CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)DirectXInit, hModule, 0, 0));	
 	}
 
-	return TRUE;
+	return true;
 }

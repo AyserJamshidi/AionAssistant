@@ -109,13 +109,11 @@ void PlaceJMP(BYTE* Address, DWORD jumpTo, DWORD length) {
 }
 
 DWORD FindPattern(const char* pattern, const char* mask) {
-	//Assign our base and module size
-	//Having the values right is ESSENTIAL, this makes sure
-	//that we don't scan unwanted memory and leading our game to crash
+	// Assign our base and module size to prevent accessing unwanted memory
 	DWORD base = (DWORD)moduleInfo.lpBaseOfDll;
 	DWORD size = (DWORD)moduleInfo.SizeOfImage;
 
-	//Get length for our mask, this will allow us to loop through our array
+	// Get length for our mask, this will allow us to loop through our array
 	DWORD patternLength = (DWORD)strlen(mask);
 
 	for (DWORD i = 0; i < size - patternLength; i++) {
@@ -126,11 +124,10 @@ DWORD FindPattern(const char* pattern, const char* mask) {
 			found &= mask[j] == '?' || pattern[j] == *(char*)(base + i + j);
 		}
 
-		//found = true, our entire pattern was found
+		// E	ntire pattern was found
 		//return the memory addy so we can write to it
-		if (found) {
+		if (found)
 			return base + i;
-		}
 	}
 
 	return NULL;

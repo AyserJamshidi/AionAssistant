@@ -1,66 +1,78 @@
 #include "hook_handler.h"
 #include <iostream>
-#include "AttachHelper.h"
-#include "memory_loop.h"
+//#include "AttachHelper.h"
+//#include "memory_loop.h"
 
 #include "MinHook/include/MinHook.h"
 #include <d3d9.h>
-#include <d3dx9.h>
 #pragma comment(lib, "d3d9.lib")
-#pragma comment(lib, "d3dx9.lib")
+//#pragma comment(lib, "d3dx9.lib")
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
 
-#include <string>
+//#include <string>
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msh, WPARAM wParam, LPARAM lParam);
 
-typedef HRESULT(APIENTRY* Reset) (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 typedef HRESULT(APIENTRY* EndScene) (IDirect3DDevice9*);
-typedef HRESULT(APIENTRY* Entity) (int);
-typedef LRESULT(CALLBACK* WNDPROC) (HWND, UINT, WPARAM, LPARAM);
-
-HRESULT APIENTRY hkReset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 HRESULT APIENTRY hkEndScene(IDirect3DDevice9*);
-HRESULT APIENTRY hkEntity(int);
+EndScene oEndScene = nullptr;
 
-Reset oReset = NULL;
-EndScene oEndScene = NULL;
-Entity oEntity = NULL;
-WNDPROC oWndProc = NULL;
+typedef HRESULT(APIENTRY* Reset) (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+HRESULT APIENTRY hkReset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+Reset oReset = nullptr;
 
-DWORD_PTR* pTable = NULL;
+typedef LRESULT(CALLBACK* WNDPROC) (HWND, UINT, WPARAM, LPARAM);
+WNDPROC oWndProc = nullptr;
 
-IDirect3D9* pD3D = NULL;
-IDirect3DDevice9* d3dDevice = NULL;
-HMODULE dllModule = NULL;
+uintptr_t* pVTable = nullptr;
 
-HWND pHwnd = FindWindowA(NULL, "AION");
+IDirect3D9* pD3D = nullptr;
+IDirect3DDevice9* d3dDevice = nullptr;
+HINSTANCE dllModule = 0;
+
+HWND pHwnd = FindWindowA(nullptr, "AION");
 //HWND winHandle = FindWindowA(NULL, "AION Client");
-//HWND winHandle = FindWindowA(NULL, "Test Environment - Engine: DirectX 9 - Made by TheAifam5");
+//HWND pHwnd = FindWindowA(NULL, "Test Environment - Engine: DirectX 9 - Made by TheAifam5");
 
-DWORD processId = NULL;
+uint64_t processId = 0; // Can probably just make it uLong or uInt later.
 
-BOOL showD3D = TRUE;
+bool showD3D = TRUE;
 
-HRESULT __stdcall hkReset(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+/*HRESULT __stdcall hkReset(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
 	std::cout << "Reset Hooked!" << std::endl;
 
 	//HRESULT returnValue = oReset(pDevice, pPresentationParameters);
 
 	return oReset(pDevice, pPresentationParameters); // returnValue;
-}
+}*/
 
-void Eject() {
+void __stdcall Eject(const char* msg, bool isInitialized) {
+	printf("%s\n", msg);
 	showD3D = FALSE;
 
-	/*if (MH_DisableHook((DWORD_PTR*)pTable[16])) { std::cout << "Couldn't remove hook 0."; }
-	if (MH_RemoveHook((DWORD_PTR*)pTable[16]) != MH_OK) { std::cout << "Couldn't remove hook 1."; }
-	if (MH_RemoveHook((DWORD_PTR*)pTable[42]) != MH_OK) { std::cout << "Couldn't remove hook 2."; }*/
+	fclose((FILE*)stdout);
 
-	if (MH_Uninitialize() != MH_OK) { std::cout << "MinHook failed to uninitialize."; }
+	HWND console = GetConsoleWindow();// We acquire the console's HANDLE before freeing as we will receive NULL if we attempt it afterwards.
+	FreeConsole(); // Free the console.
+	Sleep(200); // Without this sleep the close message sometimes closes the main window...
+	SendMessage(console, WM_CLOSE, NULL, NULL); // Send console window handle the close message.*/
+
+	if (isInitialized) {
+		SetWindowLongPtr(pHwnd, GWLP_WNDPROC, (LONG_PTR)oWndProc); // Restore the window pointer.
+
+		ImGui_ImplDX9_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+
+		// TODO: Figure out why disable/remove hook fails.
+		/*if (MH_DisableHook((DWORD_PTR*)pTable[16])) { std::cout << "Couldn't remove hook 0."; }
+		if (MH_RemoveHook((DWORD_PTR*)pTable[16]) != MH_OK) { std::cout << "Couldn't remove hook 1."; }
+		if (MH_RemoveHook((DWORD_PTR*)pTable[42]) != MH_OK) { std::cout << "Couldn't remove hook 2."; }*/
+		if (MH_Uninitialize() != MH_OK) { std::cout << "MinHook failed to uninitialize."; }
+	}
 
 	// Clear vars
 	oEndScene = NULL;
@@ -68,26 +80,21 @@ void Eject() {
 	d3dDevice = NULL;
 	pD3D->Release();
 	pD3D = NULL;
-	pTable = NULL;
+	pVTable = NULL;
 
-	SetWindowLongPtr(pHwnd, -4, LONG_PTR(oWndProc)); // Restore the window pointer.0
-
-	Sleep(1000);
-	HWND console = GetConsoleWindow();// We acquire the console's HANDLE before freeing as we will receive NULL if we attempt it afterwards.
-	FreeConsole(); // Free the console.
-	Sleep(200); // Without this sleep the close message sometimes closes the main window...
-	SendMessage(console, WM_CLOSE, NULL, NULL); // Send console window handle the close message.
 	FreeLibraryAndExitThread(dllModule, 0);
 }
 
-bool firstEndSceneLoop = true;
 HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
-	/*if (showD3D) {
-		if (firstEndSceneLoop) {
-			firstEndSceneLoop = false;
+	if (showD3D) {
+		
+		static bool initializeImGui = true;
+		if (initializeImGui) {
+			initializeImGui = false;
+
 			ImGui::CreateContext();
 			ImGuiIO& io = ImGui::GetIO();
-			io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+			//io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 
 			ImGui_ImplWin32_Init(pHwnd);
 			ImGui_ImplDX9_Init(pDevice);
@@ -97,33 +104,33 @@ HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		if (MemLoop::IsInitialized()) {
-		}
+		//if (MemLoop::IsInitialized()) {
+		//}
 
 		if (ImGui::Button("Unload")) {
-			DWORD procId;
+			/*DWORD procId;
 			GetWindowThreadProcessId(pHwnd, &procId);
 			//pHandle = OpenProcess(PROCESS_VM_READ, 0, procId);
 			MemLoop::Initialize(OpenProcess(PROCESS_VM_READ, 0, procId));
-			//oWndProc = NULL;
-			//CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Eject, dllModule, NULL, NULL);
+			//oWndProc = NULL;*/
+			CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Eject, 0, 0, 0);
 		}
 
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-	}*/
+	}
 
 	return oEndScene(pDevice);
 }
 
-LRESULT CALLBACK WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (wParam) {
 	case VK_UP:
 		if (uMsg == WM_KEYDOWN) {
 			std::cout << "UP" << std::endl;
-			oWndProc = NULL;
-			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)Eject, dllModule, NULL, NULL);
+			oWndProc = nullptr;
+			CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Eject, dllModule, 0, 0);
 		}
 		break;
 	case VK_DOWN:
@@ -134,7 +141,7 @@ LRESULT CALLBACK WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		break;
 	case VK_LEFT:
 		if (uMsg == WM_KEYDOWN) {
-			GetName();
+			//GetName();
 		}
 	case WM_LBUTTONDOWN:
 		break;
@@ -186,70 +193,47 @@ LRESULT CALLBACK WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	/*if (showD3D && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return true;*/
 
-	return (showD3D && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) ? TRUE : CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+	return (showD3D && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) ? true : CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-DWORD WINAPI DirectXInit(__in  LPVOID lpParameter) {
-	dllModule = (HMODULE)lpParameter;
-
+DWORD __stdcall DirectXInit(HMODULE lpParameter) {
+	// TODO: Is there a better way to pass this variable along to eject?
+	dllModule = lpParameter;
+	
 	pD3D = Direct3DCreate9(D3D_SDK_VERSION);
-	if (pD3D == NULL) {
-		std::cout << "Failed to create D3D interface." << std::endl;
-		Eject();
-		return -1;
-	}
 
-	D3DPRESENT_PARAMETERS d3dpp{ 0 };
+	if (pD3D == nullptr) { Eject("Failed to create D3D interface.", false); return true; }
+
+	D3DPRESENT_PARAMETERS d3dpp { 0 };
 	d3dpp.hDeviceWindow = pHwnd, d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD, d3dpp.Windowed = TRUE;
 
-	if (FAILED(pD3D->CreateDevice(0, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d3dDevice))) {
-		std::cout << "Failed to create D3D device." << std::endl;
-		Eject();
-		return -1;
-	}
+	if (FAILED(pD3D->CreateDevice(0, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d3dDevice)))
+		Eject("Failed to create D3D device.", false); return true;
 
-	pTable = (DWORD_PTR*)d3dDevice;
-	pTable = (DWORD_PTR*)pTable[0];
+	pVTable = (uintptr_t*)d3dDevice;
+	pVTable = (uintptr_t*)pVTable[0];
 
-	if (d3dDevice)
-		d3dDevice->Release(), d3dDevice = NULL;
+	if (d3dDevice) { d3dDevice->Release(), d3dDevice = nullptr; }
 
-	oReset = (Reset)pTable[16]; // Set oReset to the original Reset.
-	oEndScene = (EndScene)pTable[42]; // Set oEndScene to the original EndScene.
+	if (MH_Initialize() != MH_OK) { Eject("Failed to initialize MinHook.", false); return true; }
 
-	if (MH_Initialize() != MH_OK) { return 1; }
-	if (MH_CreateHook((DWORD_PTR*)pTable[16], &hkReset, reinterpret_cast<void**>(&oReset)) != MH_OK) { return 1; }
-	if (MH_EnableHook((DWORD_PTR*)pTable[16]) != MH_OK) { return 1; }
-	if (MH_CreateHook((DWORD_PTR*)pTable[42], &hkEndScene, reinterpret_cast<void**>(&oEndScene)) != MH_OK) { return 1; }
-	if (MH_EnableHook((DWORD_PTR*)pTable[42]) != MH_OK) { return 1; }
+	/*oReset = (Reset)pVTable[16]; // Set oReset to the original Reset.
+	if (MH_CreateHook((uintptr_t*)pVTable[16], &hkReset, reinterpret_cast<void**>(&oReset)) != MH_OK) { return true; }
+	if (MH_EnableHook((uintptr_t*)pVTable[16]) != MH_OK) { return true; }*/
+
+	oEndScene = (EndScene)pVTable[42]; // Set oEndScene to the original EndScene.
+	if (MH_CreateHook((uintptr_t*)pVTable[42], &hkEndScene, reinterpret_cast<void**>(&oEndScene)) != MH_OK) { return true; }
+	if (MH_EnableHook((uintptr_t*)pVTable[42]) != MH_OK) { return true; }
+
 	//82 == DrawIndexedPrimitive
-
-	printf("Everything hooked.");
-
-	if (MH_CreateHook((LPVOID)0x4C83A0FE, &hkEntity, reinterpret_cast<void**>(&oEntity)) != MH_OK) { return 1; }
-	printf("1pass");
-	Sleep(2000);
-	if (MH_EnableHook((LPVOID)0x4C83A0FE) != MH_OK) { return 1; }
-	printf("2pass");
-	Sleep(2000);
 
 	oWndProc = WNDPROC(SetWindowLongPtr(pHwnd, -4 /* GWL_WNDPROC(x86), GWLP_WNDPROC(x86_64) */, (LONG_PTR)WndProc));
 
-	DWORD procId;
+	/*DWORD procId;
 	GetWindowThreadProcessId(pHwnd, &procId);
 	//pHandle = OpenProcess(PROCESS_VM_READ, 0, procId);
-	MemLoop::Initialize(OpenProcess(PROCESS_VM_READ, 0, procId));
+	MemLoop::Initialize(OpenProcess(PROCESS_VM_READ, 0, procId));*/
 
-	std::cout << "Successful." << std::endl;
-
-	//F1();
-
-	return 1;
-}
-
-HRESULT __stdcall hkEntity(int i) {
-	printf("Inside hkEntity! i = %i", i);
-	//return Entity(i);
-
-	return i;
+	printf("Successful hook.\n");
+	return true;
 }
