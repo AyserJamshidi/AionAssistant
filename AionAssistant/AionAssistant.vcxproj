@@ -181,7 +181,6 @@
     <ClInclude Include="AttachHelper.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="Entity.h" />
-    <ClInclude Include="framework.h" />
     <ClInclude Include="hook_handler.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -200,7 +199,6 @@
     <ClInclude Include="MinHook\src\HDE\table32.h" />
     <ClInclude Include="MinHook\src\HDE\table64.h" />
     <ClInclude Include="MinHook\src\trampoline.h" />
-    <ClInclude Include="test.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AttachHelper.cpp" />
