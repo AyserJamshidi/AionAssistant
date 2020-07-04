@@ -6,7 +6,7 @@
 #include "MinHook/include/MinHook.h"
 #include <d3d9.h>
 #pragma comment(lib, "d3d9.lib")
-//#pragma comment(lib, "d3dx9.lib")
+#pragma comment(lib, "d3dx9.lib")
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx9.h"
@@ -14,43 +14,46 @@
 
 //#include <string>
 
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msh, WPARAM wParam, LPARAM lParam);
-
+// DirectX9 EndScene() hook variables.
 typedef HRESULT(APIENTRY* EndScene) (IDirect3DDevice9*);
 HRESULT APIENTRY hkEndScene(IDirect3DDevice9*);
 EndScene oEndScene = nullptr;
+bool showD3D = TRUE;
 
+// DirectX9 Reset() hook.
+// TODO: Do we need this?
 typedef HRESULT(APIENTRY* Reset) (IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 HRESULT APIENTRY hkReset(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 Reset oReset = nullptr;
 
+// Cursor handling.
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msh, WPARAM wParam, LPARAM lParam);
 typedef LRESULT(CALLBACK* WNDPROC) (HWND, UINT, WPARAM, LPARAM);
 WNDPROC oWndProc = nullptr;
 
-uintptr_t* pVTable = nullptr;
-
+// DirectX9 variables, created in order of use.
 IDirect3D9* pD3D = nullptr;
 IDirect3DDevice9* d3dDevice = nullptr;
-HINSTANCE dllModule = 0;
+uintptr_t* pVTable = nullptr;
+
+HINSTANCE dllModule = nullptr;
 
 HWND pHwnd = FindWindowA(nullptr, "AION");
-//HWND winHandle = FindWindowA(NULL, "AION Client");
 //HWND pHwnd = FindWindowA(NULL, "Test Environment - Engine: DirectX 9 - Made by TheAifam5");
 
 uint64_t processId = 0; // Can probably just make it uLong or uInt later.
 
-bool showD3D = TRUE;
 
-/*HRESULT __stdcall hkReset(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
+HRESULT __stdcall hkReset(LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
 	std::cout << "Reset Hooked!" << std::endl;
 
 	//HRESULT returnValue = oReset(pDevice, pPresentationParameters);
 
 	return oReset(pDevice, pPresentationParameters); // returnValue;
-}*/
+}
 
 void __stdcall Eject(const char* msg, bool isInitialized) {
-	printf("%s\n", msg);
+	printf("%s \n", msg);
 	showD3D = FALSE;
 
 	fclose((FILE*)stdout);
@@ -85,10 +88,10 @@ void __stdcall Eject(const char* msg, bool isInitialized) {
 	FreeLibraryAndExitThread(dllModule, 0);
 }
 
+bool initializeImGui = true;
 HRESULT __stdcall hkEndScene(LPDIRECT3DDEVICE9 pDevice) {
 	if (showD3D) {
 		
-		static bool initializeImGui = true;
 		if (initializeImGui) {
 			initializeImGui = false;
 
@@ -207,8 +210,10 @@ DWORD __stdcall DirectXInit(HMODULE lpParameter) {
 	D3DPRESENT_PARAMETERS d3dpp { 0 };
 	d3dpp.hDeviceWindow = pHwnd, d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD, d3dpp.Windowed = TRUE;
 
-	if (FAILED(pD3D->CreateDevice(0, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d3dDevice)))
-		Eject("Failed to create D3D device.", false); return true;
+	if (FAILED(pD3D->CreateDevice(0, D3DDEVTYPE_HAL, d3dpp.hDeviceWindow, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &d3dpp, &d3dDevice))) {
+		Eject("Failed to create D3D device.", false);
+		return true;
+	}
 
 	pVTable = (uintptr_t*)d3dDevice;
 	pVTable = (uintptr_t*)pVTable[0];
@@ -217,9 +222,9 @@ DWORD __stdcall DirectXInit(HMODULE lpParameter) {
 
 	if (MH_Initialize() != MH_OK) { Eject("Failed to initialize MinHook.", false); return true; }
 
-	/*oReset = (Reset)pVTable[16]; // Set oReset to the original Reset.
+	oReset = (Reset)pVTable[16]; // Set oReset to the original Reset.
 	if (MH_CreateHook((uintptr_t*)pVTable[16], &hkReset, reinterpret_cast<void**>(&oReset)) != MH_OK) { return true; }
-	if (MH_EnableHook((uintptr_t*)pVTable[16]) != MH_OK) { return true; }*/
+	if (MH_EnableHook((uintptr_t*)pVTable[16]) != MH_OK) { return true; }
 
 	oEndScene = (EndScene)pVTable[42]; // Set oEndScene to the original EndScene.
 	if (MH_CreateHook((uintptr_t*)pVTable[42], &hkEndScene, reinterpret_cast<void**>(&oEndScene)) != MH_OK) { return true; }

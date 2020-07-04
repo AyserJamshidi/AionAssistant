@@ -1,39 +1,15 @@
-/*// dllmain.cpp : Defines the entry point for the DLL application.
-#include "dllmain.h"
-#include <iostream>
-
-#include "MinHook/include/MinHook.h"
-
-#include "ImGui/imgui.h"
-#include "ImGui/imgui_impl_dx9.h"
-#include "ImGui/imgui_impl_win32.h"
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
-
-	if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
-		AllocConsole();
-		FILE* pCout; // Dummy file so we can properly in/output to console while avoiding security issues from freopen(..).
-		freopen_s(&pCout, "CONOUT$", "w", stdout);
-
-		//CloseHandle(CreateThread(NULL, NULL, DirectXInit, hModule, NULL, NULL));
-		CreateThread(NULL, NULL, DirectXInit, hModule, NULL, NULL);
-		//DisableThreadLibraryCalls(hModule);
-	}
-
-	return TRUE;
-}*/
-
 #include "dllmain.h"
 
 #include <Windows.h>
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
+#include <thread>
 
-extern "C" DWORD_PTR jmpBackAddr;
-extern "C" void interceptEntities(DWORD_PTR givenAddress);
+extern "C" uintptr_t jmpBackAddr; // Placeholder for our ASM jump back address.
+extern "C" void interceptEntities(uintptr_t givenAddress);
 
-DWORD_PTR jmpBackAddr;
+uintptr_t jmpBackAddr;
 
 extern "C" void AION();
 
@@ -46,7 +22,7 @@ void DetourRemove(void* pSource, int dwLen) {
 	if (*(WORD*)(pSource) != 0x25FF)
 		return;
 
-	void* pTrampoline = *(void**)((DWORD_PTR)pSource + 6);
+	void* pTrampoline = *(void**)((uintptr_t)pSource + 6);
 
 	DWORD oldProtect = 0;
 	VirtualProtect(pSource, dwLen, PAGE_EXECUTE_READWRITE, &oldProtect);
@@ -59,12 +35,19 @@ void DetourRemove(void* pSource, int dwLen) {
 void* DetourFunction(void* pSource, void* pDestination, int dwLen) {
 	int MinLen = 14;
 
+	/* If length of bytes we are stealing is < 14 bytes we SHOULD NOT modify anything.
+	 *
+	 * 64-bit ASM requires at least 14 bytes to detour as that is the bare minimum for
+	 * the QWORD pointer we are going to redirect to.
+	 * 
+	 * Continuing with < 14 bytes will corrupt the stack and crash Aion.
+	 */
 	if (dwLen < MinLen)
-		return NULL;
+		return nullptr;
 
 	BYTE stub[] = {
 		0xFF, 0x25, 0x00, 0x00, 0x00, 0x00,                // jmp qword ptr [$+6]
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00     // ptr
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00     // ptr that we input
 	};
 
 	// Gets address for detour code
@@ -91,9 +74,8 @@ void* DetourFunction(void* pSource, void* pDestination, int dwLen) {
 	memcpy(pSource, stub, sizeof(stub));
 
 	// Apply NOPs if we didn't use enough bytes yet
-	for (int i = MinLen; i < dwLen; i++) {
+	for (int i = MinLen; i < dwLen; i++)
 		*(BYTE*)((DWORD_PTR)pSource + i) = 0x90;
-	}
 
 	VirtualProtect(pSource, dwLen, dwOld, &dwOld);
 
@@ -123,12 +105,7 @@ bool Hook(BYTE* pTarget, BYTE* pHook, UINT Length) {
 	return true;
 }
 
-extern "C" int curNum;
-
-int curNum = 1;
 void interceptEntities(uintptr_t givenAddress) {
-	std::cout << "curNum = " << curNum << " ";
-	curNum++;
 	printf("%I64x\n", givenAddress);
 }
 
@@ -140,10 +117,10 @@ void Blah() {
 
 	printf("Hooked!\n");
 
-	DWORD_PTR entityHandle = (DWORD_PTR)GetModuleHandleW(L"CryEntitySystem.dll");
+	uintptr_t entityHandle = (uintptr_t)GetModuleHandleW(L"CryEntitySystem.dll");
 
 	if (entityHandle != NULL) {
-		DWORD_PTR initialAddr = entityHandle + 0x5A107;
+		uintptr_t initialAddr = entityHandle + 0x5A107;
 		int byteLength = 16;
 		jmpBackAddr = initialAddr + byteLength;
 
@@ -154,7 +131,7 @@ void Blah() {
 	//std::cout << "Bool = " << Hook((BYTE*)0x7FFCC361FE38, (BYTE*)AION, 16);
 }
 
-BOOL WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) {
+int __stdcall DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) {
 
 	//DisableThreadLibraryCalls(hModule);
 
@@ -163,8 +140,8 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) {
 		FILE* pCout; // Dummy file so we can properly in/output to console while avoiding security issues from freopen(..).
 		freopen_s(&pCout, "CONOUT$", "w", stdout);
 
-		HANDLE entityLoopHandle = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Blah, 0, 0, 0);
-
+		//HANDLE entityLoopHandle = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Blah, 0, 0, 0);
+		//std::thread(Blah).detach();
 		CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)DirectXInit, hModule, 0, 0));	
 	}
 

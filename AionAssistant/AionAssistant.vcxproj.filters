@@ -30,14 +30,14 @@
     <Filter Include="MinHook\src\HDE">
       <UniqueIdentifier>{d58da725-2388-4052-b2b4-d9e1f006f1ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\model">
-      <UniqueIdentifier>{7e94a265-939c-4876-9e4f-9f648f5215bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\model">
-      <UniqueIdentifier>{28da99c1-57da-4d22-abf2-b0f8859aa15d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Assembly">
       <UniqueIdentifier>{6e8d7aee-6120-4baf-9a4e-f9aed45468e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\models">
+      <UniqueIdentifier>{28da99c1-57da-4d22-abf2-b0f8859aa15d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\models">
+      <UniqueIdentifier>{7e94a265-939c-4876-9e4f-9f648f5215bc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -101,8 +101,14 @@
     <ClInclude Include="memory_loop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Header Files\model</Filter>
+    <ClInclude Include="Structures.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="AionEntity.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="AionPlayer.h">
+      <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -151,8 +157,8 @@
     <ClCompile Include="memory_loop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Source Files\model</Filter>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
