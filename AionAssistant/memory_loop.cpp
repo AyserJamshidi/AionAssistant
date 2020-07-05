@@ -25,7 +25,7 @@ void entityHook() {
 	std::cout << "Hi!" << std::endl;
 }
 
-BOOL MemLoop::Initialize(HANDLE givenHandle) {
+/*BOOL MemLoop::Initialize(HANDLE givenHandle) {
 	dllHandle = givenHandle;
 
 	// Initialize Aion.bin information to find Entity List
@@ -35,7 +35,7 @@ BOOL MemLoop::Initialize(HANDLE givenHandle) {
 	else {
 		// TODO: Error message
 		return FALSE;
-	}
+	}*/
 
 	/*gameDllBaseAddress = (DWORD)GetModuleHandle(L"Game.dll");//dwGetModuleBaseAddress(globalVariables::getProcessID(), L"Game.dll");
 	if (gameDllBaseAddress != NULL) {
@@ -49,10 +49,11 @@ BOOL MemLoop::Initialize(HANDLE givenHandle) {
 		return FALSE;
 	}*/
 
-	printf("Initializing...");
+	/*printf("Initializing...");
 
 	DWORD entityArrAddy = FindPattern("\x48\x8B\x78\x28\x48\x85\xFF", "xxxxxxx");
-	printf("entityArrAddy == %x\n", entityArrAddy);
+	printf("entityArrAddy == %x\n", entityArrAddy);*/
+
 	/*if (entityArrAddy != NULL && entityArrAddy == 0x4B75A0FE) {
 		std::cout << "Not null!" << std::endl;
 		DWORD EntlistJmpBack = entityArrAddy + 0x7;
@@ -62,12 +63,9 @@ BOOL MemLoop::Initialize(HANDLE givenHandle) {
 		// TODO: Error message
 		printf("Something went wrong!");
 	}*/
-	return TRUE;
-}
 
-void EntityObjStart() {
-
-}
+	/*return TRUE;
+}*/
 
 /*__declspec(naked) void entityHook() {
 	__asm {
@@ -83,7 +81,7 @@ void EntityObjStart() {
 	}
 }*/
 
-void PlaceJMP(BYTE* Address, DWORD jumpTo, DWORD length) {
+/*void PlaceJMP(BYTE* Address, DWORD jumpTo, DWORD length) {
 	DWORD dwOldProtect, dwBkup, dwRelAddr;
 
 	//give that address read and write permissions and store the old permissions at oldProtection
@@ -106,9 +104,9 @@ void PlaceJMP(BYTE* Address, DWORD jumpTo, DWORD length) {
 
 	// Restore the default permissions
 	VirtualProtect(Address, length, dwOldProtect, &dwBkup);
-}
+}*/
 
-DWORD FindPattern(const char* pattern, const char* mask) {
+/*DWORD FindPattern(const char* pattern, const char* mask) {
 	// Assign our base and module size to prevent accessing unwanted memory
 	DWORD base = (DWORD)moduleInfo.lpBaseOfDll;
 	DWORD size = (DWORD)moduleInfo.SizeOfImage;
@@ -124,57 +122,18 @@ DWORD FindPattern(const char* pattern, const char* mask) {
 			found &= mask[j] == '?' || pattern[j] == *(char*)(base + i + j);
 		}
 
-		// E	ntire pattern was found
-		//return the memory addy so we can write to it
+		// Entire pattern was found
+		// return the memory addy so we can write to it
 		if (found)
 			return base + i;
 	}
 
 	return NULL;
-}
-
-BOOL MemLoop::IsInitialized() {
-	return gameDllBaseAddress != NULL;
-}
-
-/*DWORD GetPointerAddress(DWORD BaseAddress, std::vector<DWORD> Offsets) {
-	DWORD Ptr = *(DWORD*)(BaseAddress);
-	DWORD oldPtr;
-	if (Ptr == 0) return NULL;
-
-	for (int i = 0; i < Offsets.size(); i++) {
-		//if (i == Offsets.size() - 1) {
-		if (i == Offsets.size() - 1) {
-			oldPtr = Ptr;
-			Ptr = (DWORD)(Ptr + Offsets[i]);
-			if (Ptr == 0 || oldPtr == Ptr || Ptr == 0xCDCDCDCD) return NULL;
-			return Ptr;
-		} else {
-			oldPtr = Ptr;
-			Ptr = *(DWORD*)(Ptr + Offsets[i]);
-			if (Ptr == 0 || oldPtr == Ptr || Ptr == 0xCDCDCDCD) return NULL;
-		}
-	}
-
-	return Ptr;
 }*/
 
-template<class CharT = char>
-std::basic_string<CharT> read_chars(std::uintptr_t address, std::size_t max_length = 256) {
-	std::basic_string<CharT> str(max_length, CharT());
-	// I'll assume this throws on failed read.
-	// If you are using c++17 you can call str.data() instead of &str[0]
-	read(address, &str[0], sizeof(CharT) * max_length);
-	// get the position of null terminator
-	auto it = str.find(CharT());
-	// don't want to waste an allocation and will return the existing string to be reused
-	if (it == str.npos)
-		str.clear();
-	else
-		str.resize(it);
-
-	return str;
-}
+/*BOOL MemLoop::IsInitialized() {
+	return gameDllBaseAddress != NULL;
+}*/
 
 // Internal Memory Reader
 uintptr_t GetInternalPtrAddr(uintptr_t ptr, std::vector<unsigned int> offsets) {
@@ -185,28 +144,25 @@ uintptr_t GetInternalPtrAddr(uintptr_t ptr, std::vector<unsigned int> offsets) {
 
 		//addr = *(uintptr_t*)addr;
 		ReadProcessMemory(dllHandle, (LPVOID)addr, &addr, sizeof(addr), 0);
-		//std::cout << "Ptr of addr is " << std::hex << addr << std::endl;
 
-		if (addr == NULL) {
-			//std::cout << "Pointer is NULL, we're breaking out! 2" << std::endl;
+		if (addr == NULL)
 			return NULL;
-		}
+
 		addr += offsets[i];
 	}
 
-	//std::cout << "------------Returning address " << std::hex << addr << std::endl;
 	return addr;
 }
 
-void MemLoop::MainLoop() {
+/*void MemLoop::MainLoop() {
 
-}
+}*/
 
 /* Make an entity class and input all of this data there instead of having all of this in the mem loop
 
 	- Make sure everything works before adding setters.
 */
-char* GetName() {
+/*char* GetName() {
 	//DWORD attackSpeedAddr = GetPointerAddress(cEntitySystem, nameOffsets); //GetInternalPtrAddr(cEntitySystem, attackSpeedOffsets);
 
 	DWORD entityListAddr = GetInternalPtrAddr(cEntitySystem, { 0x58, 0x10, 0x28, 0xE8, 0x30 });
@@ -264,22 +220,8 @@ void GetNote() {
 
 }
 
-#include <iostream>
-float GetX() {
-	/*DWORD xPosAddress = FindDMAAddy(0x341D4910, { 0x522 }); //GetPointerAddress(5, playerXOffsets, finalGameAddress);
-
-	if (xPosAddress != NULL) {
-		WriteProcessMemory(pHandle, (LPVOID)xPosAddress, &x, sizeof(x), NULL);
-	}*/
-
-
-
-	/*DWORD ammoAddr = FindDMAAddy(0x341D4910, { 0x522 }); //GetPointerAddress(2, { 0x198, 0xA0 }, NULL);
-
-	int xPos;
-	ReadProcessMemory(pHandle, (LPVOID)ammoAddr, &xPos, sizeof(xPos), NULL);
-	std::cout << "Num = " << xPos << std::endl;*/
-	return 0;// xPos;
+void GetX() {
+	
 }
 
 void GetY() {
@@ -331,4 +273,4 @@ void GetDetectionLevel() { // Find a better name for this (Eye hack)
 
 void GetTargetOfTarget() { // Make it return the entity addr
 
-}
+}*/

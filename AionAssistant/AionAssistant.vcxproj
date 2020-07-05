@@ -178,9 +178,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AttachHelper.h" />
+    <ClInclude Include="attach_helper.h" />
+    <ClInclude Include="CodeCave\detour.h" />
     <ClInclude Include="dllmain.h" />
-    <ClInclude Include="AionEntity.h" />
     <ClInclude Include="hook_handler.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -199,11 +199,13 @@
     <ClInclude Include="MinHook\src\HDE\table32.h" />
     <ClInclude Include="MinHook\src\HDE\table64.h" />
     <ClInclude Include="MinHook\src\trampoline.h" />
-    <ClInclude Include="AionPlayer.h" />
-    <ClInclude Include="Structures.h" />
+    <ClInclude Include="Models\AionEntity.h" />
+    <ClInclude Include="Models\AionPlayer.h" />
+    <ClInclude Include="Models\Structures.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AttachHelper.cpp" />
+    <ClCompile Include="attach_helper.cpp" />
+    <ClCompile Include="CodeCave\detour.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="hook_handler.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -218,10 +220,7 @@
     <ClCompile Include="MinHook\src\HDE\hde64.c" />
     <ClCompile Include="MinHook\src\hook.c" />
     <ClCompile Include="MinHook\src\trampoline.c" />
-    <ClCompile Include="Player.cpp" />
-    <MASM Include="Assembly.asm">
-      <FileType>Document</FileType>
-    </MASM>
+    <MASM Include="CodeCave\Assembly.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

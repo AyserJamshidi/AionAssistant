@@ -15,10 +15,10 @@ public:
 class EntityClass {
 public:
 	char pad_0x0000[0x40];
-	WORD N0000011B; // 0x40 
+	WORD N0000011B; // 0x40
 	char pad_0x0042[0x3];
-	char N00000225; // 0x45 
-	wchar_t name[66]; // 0x46 
+	char N00000225; // 0x45
+	wchar_t name[66]; // 0x46
 	WORD N0000027B; 
-	wchar_t owner[27]; //0x00CC 
+	wchar_t owner[27]; //0x00CC
 };
