@@ -1,5 +1,5 @@
 EXTERN jmpBackAddr : PROTO
-interceptEntities PROTO C
+EntityIntercept PROTO C
 
 .CODE
 PUBLIC AION
@@ -24,7 +24,7 @@ AION PROC
 	;push r14
 	;push r15
 
-	call interceptEntities
+	call EntityIntercept
 	
 	;call writeHi
 

@@ -178,9 +178,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="attach_helper.h" />
     <ClInclude Include="CodeCave\detour.h" />
-    <ClInclude Include="dllmain.h" />
+    <ClInclude Include="Handlers\entity_handler.h" />
     <ClInclude Include="hook_handler.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -204,9 +203,9 @@
     <ClInclude Include="Models\Structures.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="attach_helper.cpp" />
     <ClCompile Include="CodeCave\detour.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Handlers\entity_handler.cpp" />
     <ClCompile Include="hook_handler.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />

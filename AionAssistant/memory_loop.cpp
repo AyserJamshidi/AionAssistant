@@ -106,30 +106,29 @@ void entityHook() {
 	VirtualProtect(Address, length, dwOldProtect, &dwBkup);
 }*/
 
-/*DWORD FindPattern(const char* pattern, const char* mask) {
+uintptr_t FindPattern(const char* pattern, const char* mask) {
 	// Assign our base and module size to prevent accessing unwanted memory
-	DWORD base = (DWORD)moduleInfo.lpBaseOfDll;
-	DWORD size = (DWORD)moduleInfo.SizeOfImage;
+	uintptr_t base = (uintptr_t)moduleInfo.lpBaseOfDll;
+	uintptr_t size = (uintptr_t)moduleInfo.SizeOfImage;
 
 	// Get length for our mask, this will allow us to loop through our array
-	DWORD patternLength = (DWORD)strlen(mask);
+	uintptr_t patternLength = (uintptr_t)strlen(mask);
 
-	for (DWORD i = 0; i < size - patternLength; i++) {
+	for (uintptr_t i = 0; i < size - patternLength; i++) {
 		bool found = true;
-		for (DWORD j = 0; j < patternLength; j++) {
-			//if we have a ? in our mask then we have true by default, 
+		for (uintptr_t j = 0; j < patternLength; j++) {
+			//if we have a ? in our mask then we have true by default,
 			//or if the bytes match then we keep searching until finding it or not
 			found &= mask[j] == '?' || pattern[j] == *(char*)(base + i + j);
 		}
 
-		// Entire pattern was found
-		// return the memory addy so we can write to it
+		// Pattern was found, return the address where it begins.
 		if (found)
 			return base + i;
 	}
 
 	return NULL;
-}*/
+}
 
 /*BOOL MemLoop::IsInitialized() {
 	return gameDllBaseAddress != NULL;
@@ -221,7 +220,7 @@ void GetNote() {
 }
 
 void GetX() {
-	
+
 }
 
 void GetY() {

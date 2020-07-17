@@ -8,7 +8,7 @@ private:
 
 public:
 	char pad_0x0000[0xA0];
-	Vector3 position; //0xA0 
+	Vector3 position; //0xA0
 
 };
 
@@ -19,6 +19,6 @@ public:
 	char pad_0x0042[0x3];
 	char N00000225; // 0x45
 	wchar_t name[66]; // 0x46
-	WORD N0000027B; 
+	WORD N0000027B;
 	wchar_t owner[27]; //0x00CC
 };

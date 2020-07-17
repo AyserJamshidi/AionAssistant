@@ -1,7 +1,9 @@
 #pragma once
+#include <Windows.h>
 
-class hook_handler {
+class AAGUI {
 private:
 
 public:
+	static bool __stdcall Initialize(HMODULE lpParameter);
 };

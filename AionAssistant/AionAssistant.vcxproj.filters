@@ -33,14 +33,17 @@
     <Filter Include="Header Files\models">
       <UniqueIdentifier>{28da99c1-57da-4d22-abf2-b0f8859aa15d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\models">
-      <UniqueIdentifier>{7e94a265-939c-4876-9e4f-9f648f5215bc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\codecave">
       <UniqueIdentifier>{658729e1-396d-4174-9fc5-95bd17c9f2f5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\codecave">
       <UniqueIdentifier>{1a12df5c-8f60-447a-924c-539b2c693d64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\handlers">
+      <UniqueIdentifier>{558f9fa7-36c2-4f89-8e7c-b707a979eaee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\handlers">
+      <UniqueIdentifier>{6cc7f7a8-5098-4729-8e1f-8e65e1693b0d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +95,6 @@
     <ClInclude Include="MinHook\src\HDE\table64.h">
       <Filter>MinHook\src\HDE</Filter>
     </ClInclude>
-    <ClInclude Include="dllmain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="hook_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -107,14 +107,14 @@
     <ClInclude Include="Models\AionPlayer.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="attach_helper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Models\Structures.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
     <ClInclude Include="CodeCave\detour.h">
       <Filter>Header Files\codecave</Filter>
+    </ClInclude>
+    <ClInclude Include="Handlers\entity_handler.h">
+      <Filter>Header Files\handlers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,11 +160,11 @@
     <ClCompile Include="memory_loop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="attach_helper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CodeCave\detour.cpp">
       <Filter>Source Files\codecave</Filter>
+    </ClCompile>
+    <ClCompile Include="Handlers\entity_handler.cpp">
+      <Filter>Source Files\handlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
