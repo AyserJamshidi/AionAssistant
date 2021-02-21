@@ -45,6 +45,15 @@
     <Filter Include="Header Files\handlers">
       <UniqueIdentifier>{6cc7f7a8-5098-4729-8e1f-8e65e1693b0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UberSwitch">
+      <UniqueIdentifier>{1bed7eec-2bbf-4d8c-8c6c-4cb37d714ae8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UberSwitch\include">
+      <UniqueIdentifier>{6b87bba4-b201-473a-9906-21dc6542ae0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UberSwitch\include\fameta">
+      <UniqueIdentifier>{5fb1a35f-a02a-42d0-aae3-489d4434b15a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -116,6 +125,15 @@
     <ClInclude Include="Handlers\entity_handler.h">
       <Filter>Header Files\handlers</Filter>
     </ClInclude>
+    <ClInclude Include="UberSwitch\include\uberswitch.hpp">
+      <Filter>UberSwitch\include</Filter>
+    </ClInclude>
+    <ClInclude Include="UberSwitch\include\fameta\counter.hpp">
+      <Filter>UberSwitch\include\fameta</Filter>
+    </ClInclude>
+    <ClInclude Include="test_thing.h">
+      <Filter>Header Files\handlers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -165,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="Handlers\entity_handler.cpp">
       <Filter>Source Files\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="test_thing.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

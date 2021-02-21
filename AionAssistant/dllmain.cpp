@@ -5,7 +5,6 @@
 #include <thread>
 
 #include "hook_handler.h"
-#include "Handlers/entity_handler.h"
 
 void AionAssistantInitialize(HMODULE hModule);
 bool AionInitWaiter(int timeToWait);
@@ -15,28 +14,30 @@ int __stdcall DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) {
 	//DisableThreadLibraryCalls(hModule);
 
 	if (fdwReason == DLL_PROCESS_ATTACH) {
-		//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantInitialize, hModule, 0, 0));
-		std::thread(AionAssistantInitialize, hModule).detach();
+		CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantInitialize, hModule, 0, 0));
+		//std::thread(AionAssistantInitialize, hModule).detach();
 	}
 
 	return true;
 }
 
+ 
 void AionAssistantInitialize(HMODULE hModule) {
 	AllocConsole();
 	FILE* pCout; // Dummy file so we can properly in/output to console while avoiding security issues from freopen(..).
 	freopen_s(&pCout, "CONOUT$", "w", stdout);
-
+	 
 	if (AionInitWaiter(60)) {
 		printf("Aion is initialized!\n");
-
-		AAGUI::Initialize(hModule);
-		//EntityHandler::Initialize(0x5A107);
+		 
+		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AAGUI::Initialize, hModule, 0, 0);
+		
 		//EntityHandler::Uninitialize();
 		//std::thread(AAGUI::Initialize, hModule).detach();
 		//std::thread(EntityHandler::Initialize, 0x5A107).detach();
 	} else {
 		// TODO: Send a MessageBox (or anything) to the user with error message.
+		system("PAUSE");
 		FreeLibraryAndExitThread(hModule, 0);
 	}
 }

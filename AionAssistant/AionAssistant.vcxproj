@@ -201,6 +201,9 @@
     <ClInclude Include="Models\AionEntity.h" />
     <ClInclude Include="Models\AionPlayer.h" />
     <ClInclude Include="Models\Structures.h" />
+    <ClInclude Include="test_thing.h" />
+    <ClInclude Include="UberSwitch\include\fameta\counter.hpp" />
+    <ClInclude Include="UberSwitch\include\uberswitch.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodeCave\detour.cpp" />
@@ -219,6 +222,7 @@
     <ClCompile Include="MinHook\src\HDE\hde64.c" />
     <ClCompile Include="MinHook\src\hook.c" />
     <ClCompile Include="MinHook\src\trampoline.c" />
+    <ClCompile Include="test_thing.cpp" />
     <MASM Include="CodeCave\Assembly.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

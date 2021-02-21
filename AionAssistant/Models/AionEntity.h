@@ -1,5 +1,6 @@
 #pragma once
 #include "Structures.h"
+#include <stdint.h>
 
 enum EntityName {
 	LivingGameEntity, // 0
@@ -19,8 +20,8 @@ enum EntityName {
 	unk14, // 14
 	unk15, // 15
 	unk16, // 16
-	unk17, // 17
-	PlaceableObject, // 18
+	PlaceableObject, // 17
+	unk18, //PlaceableObject, // 18
 	unk19, // 19
 	unk20, // 20
 };
