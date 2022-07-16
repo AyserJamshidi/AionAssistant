@@ -1,50 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{59acc70b-4331-4156-b8cc-fc3d0315d046}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ImGui\src">
-      <UniqueIdentifier>{42d018a4-511a-4122-b03f-460869d4de24}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ImGui\header">
-      <UniqueIdentifier>{93dd7ca7-2b12-43ec-b799-f3bd185f4d24}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MinHook">
-      <UniqueIdentifier>{6fa793e7-6f8c-4525-9e5a-30900ca66e8a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MinHook\include">
-      <UniqueIdentifier>{06311f14-ed2f-4677-973d-78dd33d9cded}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MinHook\src">
-      <UniqueIdentifier>{c00059c5-1125-499a-853b-90a47ce1679b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MinHook\src\HDE">
-      <UniqueIdentifier>{d58da725-2388-4052-b2b4-d9e1f006f1ba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\models">
-      <UniqueIdentifier>{28da99c1-57da-4d22-abf2-b0f8859aa15d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\codecave">
-      <UniqueIdentifier>{658729e1-396d-4174-9fc5-95bd17c9f2f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\codecave">
-      <UniqueIdentifier>{1a12df5c-8f60-447a-924c-539b2c693d64}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\handlers">
-      <UniqueIdentifier>{558f9fa7-36c2-4f89-8e7c-b707a979eaee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\handlers">
-      <UniqueIdentifier>{6cc7f7a8-5098-4729-8e1f-8e65e1693b0d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UberSwitch">
       <UniqueIdentifier>{1bed7eec-2bbf-4d8c-8c6c-4cb37d714ae8}</UniqueIdentifier>
     </Filter>
@@ -54,76 +10,36 @@
     <Filter Include="UberSwitch\include\fameta">
       <UniqueIdentifier>{5fb1a35f-a02a-42d0-aae3-489d4434b15a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="includes">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="includes\models">
+      <UniqueIdentifier>{28da99c1-57da-4d22-abf2-b0f8859aa15d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="includes\codecave">
+      <UniqueIdentifier>{1a12df5c-8f60-447a-924c-539b2c693d64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\codecave">
+      <UniqueIdentifier>{658729e1-396d-4174-9fc5-95bd17c9f2f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImGui\imconfig.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_dx9.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_win32.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_rectpack.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_textedit.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
-      <Filter>ImGui\header</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\include\MinHook.h">
-      <Filter>MinHook\include</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\src\buffer.h">
-      <Filter>MinHook\src</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\src\trampoline.h">
-      <Filter>MinHook\src</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\src\HDE\hde32.h">
-      <Filter>MinHook\src\HDE</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\src\HDE\hde64.h">
-      <Filter>MinHook\src\HDE</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\src\HDE\pstdint.h">
-      <Filter>MinHook\src\HDE</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\src\HDE\table32.h">
-      <Filter>MinHook\src\HDE</Filter>
-    </ClInclude>
-    <ClInclude Include="MinHook\src\HDE\table64.h">
-      <Filter>MinHook\src\HDE</Filter>
-    </ClInclude>
-    <ClInclude Include="hook_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="memory_loop.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Models\AionEntity.h">
-      <Filter>Header Files\models</Filter>
+      <Filter>includes\models</Filter>
     </ClInclude>
     <ClInclude Include="Models\AionPlayer.h">
-      <Filter>Header Files\models</Filter>
+      <Filter>includes\models</Filter>
     </ClInclude>
     <ClInclude Include="Models\Structures.h">
-      <Filter>Header Files\models</Filter>
+      <Filter>includes\models</Filter>
     </ClInclude>
     <ClInclude Include="CodeCave\detour.h">
-      <Filter>Header Files\codecave</Filter>
-    </ClInclude>
-    <ClInclude Include="Handlers\entity_handler.h">
-      <Filter>Header Files\handlers</Filter>
+      <Filter>includes\codecave</Filter>
     </ClInclude>
     <ClInclude Include="UberSwitch\include\uberswitch.hpp">
       <Filter>UberSwitch\include</Filter>
@@ -131,66 +47,15 @@
     <ClInclude Include="UberSwitch\include\fameta\counter.hpp">
       <Filter>UberSwitch\include\fameta</Filter>
     </ClInclude>
-    <ClInclude Include="test_thing.h">
-      <Filter>Header Files\handlers</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>ImGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>ImGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>ImGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_dx9.cpp">
-      <Filter>ImGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
-      <Filter>ImGui\src</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>ImGui\src</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MinHook\src\buffer.c">
-      <Filter>MinHook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="MinHook\src\hook.c">
-      <Filter>MinHook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="MinHook\src\trampoline.c">
-      <Filter>MinHook\src</Filter>
-    </ClCompile>
-    <ClCompile Include="MinHook\src\HDE\hde32.c">
-      <Filter>MinHook\src\HDE</Filter>
-    </ClCompile>
-    <ClCompile Include="MinHook\src\HDE\hde64.c">
-      <Filter>MinHook\src\HDE</Filter>
-    </ClCompile>
-    <ClCompile Include="hook_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="memory_loop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CodeCave\detour.cpp">
-      <Filter>Source Files\codecave</Filter>
-    </ClCompile>
-    <ClCompile Include="Handlers\entity_handler.cpp">
-      <Filter>Source Files\handlers</Filter>
-    </ClCompile>
-    <ClCompile Include="test_thing.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="CodeCave\Assembly.asm">
-      <Filter>Source Files\codecave</Filter>
+      <Filter>src\codecave</Filter>
     </MASM>
   </ItemGroup>
 </Project>

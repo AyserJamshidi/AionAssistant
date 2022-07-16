@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -179,50 +179,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeCave\detour.h" />
-    <ClInclude Include="Handlers\entity_handler.h" />
-    <ClInclude Include="hook_handler.h" />
-    <ClInclude Include="ImGui\imconfig.h" />
-    <ClInclude Include="ImGui\imgui.h" />
-    <ClInclude Include="ImGui\imgui_impl_dx9.h" />
-    <ClInclude Include="ImGui\imgui_impl_win32.h" />
-    <ClInclude Include="ImGui\imgui_internal.h" />
-    <ClInclude Include="ImGui\imstb_rectpack.h" />
-    <ClInclude Include="ImGui\imstb_textedit.h" />
-    <ClInclude Include="ImGui\imstb_truetype.h" />
-    <ClInclude Include="memory_loop.h" />
-    <ClInclude Include="MinHook\include\MinHook.h" />
-    <ClInclude Include="MinHook\src\buffer.h" />
-    <ClInclude Include="MinHook\src\HDE\hde32.h" />
-    <ClInclude Include="MinHook\src\HDE\hde64.h" />
-    <ClInclude Include="MinHook\src\HDE\pstdint.h" />
-    <ClInclude Include="MinHook\src\HDE\table32.h" />
-    <ClInclude Include="MinHook\src\HDE\table64.h" />
-    <ClInclude Include="MinHook\src\trampoline.h" />
     <ClInclude Include="Models\AionEntity.h" />
     <ClInclude Include="Models\AionPlayer.h" />
     <ClInclude Include="Models\Structures.h" />
-    <ClInclude Include="test_thing.h" />
     <ClInclude Include="UberSwitch\include\fameta\counter.hpp" />
     <ClInclude Include="UberSwitch\include\uberswitch.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CodeCave\detour.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Handlers\entity_handler.cpp" />
-    <ClCompile Include="hook_handler.cpp" />
-    <ClCompile Include="ImGui\imgui.cpp" />
-    <ClCompile Include="ImGui\imgui_demo.cpp" />
-    <ClCompile Include="ImGui\imgui_draw.cpp" />
-    <ClCompile Include="ImGui\imgui_impl_dx9.cpp" />
-    <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
-    <ClCompile Include="ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="memory_loop.cpp" />
-    <ClCompile Include="MinHook\src\buffer.c" />
-    <ClCompile Include="MinHook\src\HDE\hde32.c" />
-    <ClCompile Include="MinHook\src\HDE\hde64.c" />
-    <ClCompile Include="MinHook\src\hook.c" />
-    <ClCompile Include="MinHook\src\trampoline.c" />
-    <ClCompile Include="test_thing.cpp" />
     <MASM Include="CodeCave\Assembly.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
