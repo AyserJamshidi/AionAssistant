@@ -48,7 +48,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -179,15 +179,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeCave\detour.h" />
+    <ClInclude Include="src\internalstructures.h" />
+    <ClInclude Include="src\threads\entity.hpp" />
+    <ClInclude Include="src\memory\memory.hpp" />
     <ClInclude Include="Models\AionEntity.h" />
     <ClInclude Include="Models\AionPlayer.h" />
     <ClInclude Include="Models\Structures.h" />
-    <ClInclude Include="UberSwitch\include\fameta\counter.hpp" />
-    <ClInclude Include="UberSwitch\include\uberswitch.hpp" />
+    <ClInclude Include="dependencies\UberSwitch\include\fameta\counter.hpp" />
+    <ClInclude Include="dependencies\UberSwitch\include\uberswitch.hpp" />
+    <ClInclude Include="src\threads\threads.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <MASM Include="CodeCave\Assembly.asm" />
+    <ClCompile Include="src\threads\entity.cpp" />
+    <ClCompile Include="src\memory\accessors.cpp" />
+    <ClCompile Include="src\threads\entity_map_cleaner.cpp" />
+    <ClCompile Include="src\threads\timeupdater.cpp" />
+    <MASM Include="src\cave\Assembly.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,8 +24,11 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="src\codecave">
+    <Filter Include="src\cave">
       <UniqueIdentifier>{658729e1-396d-4174-9fc5-95bd17c9f2f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\memory">
+      <UniqueIdentifier>{96aaeba0-7fca-40bf-a1d1-bb6c6351754e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -41,21 +44,45 @@
     <ClInclude Include="CodeCave\detour.h">
       <Filter>includes\codecave</Filter>
     </ClInclude>
-    <ClInclude Include="UberSwitch\include\uberswitch.hpp">
+    <ClInclude Include="dependencies\UberSwitch\include\uberswitch.hpp">
       <Filter>UberSwitch\include</Filter>
     </ClInclude>
-    <ClInclude Include="UberSwitch\include\fameta\counter.hpp">
+    <ClInclude Include="dependencies\UberSwitch\include\fameta\counter.hpp">
       <Filter>UberSwitch\include\fameta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memory\memory.hpp">
+      <Filter>src\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="src\threads\entity.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\threads\threads.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internalstructures.h">
+      <Filter>includes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\memory\accessors.cpp">
+      <Filter>src\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\threads\entity.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\threads\timeupdater.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\threads\entity_map_cleaner.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="CodeCave\Assembly.asm">
-      <Filter>src\codecave</Filter>
+    <MASM Include="src\cave\Assembly.asm">
+      <Filter>src\cave</Filter>
     </MASM>
   </ItemGroup>
 </Project>
