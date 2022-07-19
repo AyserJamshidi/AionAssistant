@@ -167,6 +167,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -179,22 +180,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeCave\detour.h" />
-    <ClInclude Include="src\internalstructures.h" />
-    <ClInclude Include="src\threads\entity.hpp" />
+    <ClInclude Include="src\structures\aion.hpp" />
+    <ClInclude Include="src\structures\internalstructures.hpp" />
     <ClInclude Include="src\memory\memory.hpp" />
     <ClInclude Include="Models\AionEntity.h" />
     <ClInclude Include="Models\AionPlayer.h" />
     <ClInclude Include="Models\Structures.h" />
     <ClInclude Include="dependencies\UberSwitch\include\fameta\counter.hpp" />
     <ClInclude Include="dependencies\UberSwitch\include\uberswitch.hpp" />
-    <ClInclude Include="src\threads\threads.hpp" />
+    <ClInclude Include="src\thread_managers\threads.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="src\threads\entity.cpp" />
     <ClCompile Include="src\memory\accessors.cpp" />
-    <ClCompile Include="src\threads\entity_map_cleaner.cpp" />
-    <ClCompile Include="src\threads\timeupdater.cpp" />
+    <ClCompile Include="src\thread_managers\EntityMapManager.cpp" />
+    <ClCompile Include="src\thread_managers\TimeManager.cpp" />
     <MASM Include="src\cave\Assembly.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

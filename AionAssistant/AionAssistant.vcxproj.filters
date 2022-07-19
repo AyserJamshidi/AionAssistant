@@ -53,13 +53,13 @@
     <ClInclude Include="src\memory\memory.hpp">
       <Filter>src\memory</Filter>
     </ClInclude>
-    <ClInclude Include="src\threads\entity.hpp">
+    <ClInclude Include="src\thread_managers\threads.hpp">
       <Filter>includes</Filter>
     </ClInclude>
-    <ClInclude Include="src\threads\threads.hpp">
+    <ClInclude Include="src\structures\internalstructures.hpp">
       <Filter>includes</Filter>
     </ClInclude>
-    <ClInclude Include="src\internalstructures.h">
+    <ClInclude Include="src\structures\aion.hpp">
       <Filter>includes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -70,13 +70,10 @@
     <ClCompile Include="src\memory\accessors.cpp">
       <Filter>src\memory</Filter>
     </ClCompile>
-    <ClCompile Include="src\threads\entity.cpp">
+    <ClCompile Include="src\thread_managers\TimeManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\threads\timeupdater.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\threads\entity_map_cleaner.cpp">
+    <ClCompile Include="src\thread_managers\EntityMapManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

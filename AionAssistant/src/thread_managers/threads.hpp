@@ -3,9 +3,7 @@
 #include <ctime>
 
 class AionThreads {
-private:
-
 public:
 	static void TimeUpdater(void* givenStruct);
-	static void EntityMapCleaner(void* givenStruct);
+	static void EntityMapManager(void* givenStruct);
 };

@@ -3,10 +3,6 @@
 
 struct GlobalNeeds {
 	bool* isRunning;
-};
-
-struct TimeStructure {
-	GlobalNeeds* globalNeeds;
 	int* currentTime;
 };
 

@@ -9,9 +9,9 @@
 #include <unordered_map>
 
 #include "Dependencies/detours/detours.h"
-#include "src/threads/threads.hpp"
+#include "src/thread_managers/threads.hpp"
 #include "src/memory/memory.hpp"
-#include "src/internalstructures.h"
+#include "src/structures/internalstructures.hpp"
 
 // ASM Accessable
 extern "C" {
@@ -29,7 +29,11 @@ uintptr_t detourStartAddress;
 GlobalNeeds globalNeeds;
 bool isRunning = false; // Program threads rely on this to stay on/turn off
 int currentTime = 0; // Used as a time reference, incremented 1 every second
+
+// Entity containers
+uintptr_t playerEntity;
 std::unordered_map<uintptr_t, int> entityMap;
+
 
 __declspec(dllexport) void EntityIntercept() {
 	entityMap[entityAddress] = currentTime;
@@ -39,14 +43,14 @@ __declspec(dllexport) void EntityIntercept() {
 
 void Initialize() {
 	printf("Initializing...\n");
-	globalNeeds = { &isRunning };
+	globalNeeds = { &isRunning, &currentTime };
 	
 	// Start internal timer thread
 	//TimeStructure* timeUpdaterVar = new TimeStructure{ &isRunning, &currentTime };
-	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionThreads::TimeUpdater, new TimeStructure{ &globalNeeds, &currentTime }, 0, 0));
+	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionThreads::TimeUpdater, &globalNeeds, 0, 0));
 
 	// Start entity map cleaner thread
-	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionThreads::EntityMapCleaner, new EntityMapStructure{ &globalNeeds, &entityMap }, 0, 0));
+	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionThreads::EntityMapManager, new EntityMapStructure{ &globalNeeds, &entityMap }, 0, 0));
 
 	// Get CryEntitySystem module
 	HMODULE entityHandle = GetModuleHandleA("CryEntitySystem.dll");
@@ -56,7 +60,7 @@ void Initialize() {
 		return;
 	}
 
-	// Byte pattern scan for our entry point
+	// Byte pattern scan  our entry point
 	detourStartAddress = Memory::Accessor::FindPattern(entityHandle, "\x48\x8B\x40\x20\x48\x83\xC4\x20\x5B\xC3\xCC\xCC", "xxxxxxxxxxxx");
 
 	if (detourStartAddress == 0) {
@@ -86,6 +90,11 @@ void MainLoop(LPVOID lpThreadParameter) {
 		printf("Hi!\n");
 
 		if (GetKeyState(VK_RIGHT) & 0x8000) {
+			if (!isRunning) {
+				printf("isRunning == false, rejecting isRunning == false request!\n");
+				continue;
+			}
+
 			printf("Unloading...\n");
 			isRunning = false;
 			DetourTransactionBegin();
@@ -96,6 +105,11 @@ void MainLoop(LPVOID lpThreadParameter) {
 		}
 
 		if (GetKeyState(VK_UP) & 0x8000) {
+			if (isRunning) {
+				printf("isRunning == true, rejecting init request!\n");
+				continue;
+			}
+
 			isRunning = true;
 			Initialize();
 		}
@@ -157,6 +171,7 @@ int __stdcall DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) {
 		AllocConsole();
 		FILE* pCout; // Dummy file so we can properly in/output to console while avoiding security issues from freopen(..).
 		freopen_s(&pCout, "CONOUT$", "w", stdout);
+		setlocale(LC_ALL, "");
 
 		if (AionInitWaiter(60)) {
 			printf("Aion is initialized!\n");
