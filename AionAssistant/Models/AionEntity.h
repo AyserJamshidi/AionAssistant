@@ -26,7 +26,7 @@ enum EntityName {
 	unk20, // 20
 };
 
-class AionEntity {
+class CEntity {
 public:
 	char pad_0x0000[0x198];
 	LivingEntityClass* CLivingEntity; // 0x198

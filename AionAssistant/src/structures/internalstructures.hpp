@@ -1,12 +1,19 @@
 #pragma once
 #include <unordered_map>
+#include "aion.hpp"
 
-struct GlobalNeeds {
+struct GlobalVars {
 	bool* isRunning;
 	int* currentTime;
 };
 
 struct EntityMapStructure {
-	GlobalNeeds* globalNeeds;
+	GlobalVars* globalVars;
+	uintptr_t* playerAddress;
 	std::unordered_map<uintptr_t, int>* entityMap;
+};
+
+struct HotkeyStructure {
+	GlobalVars* globalVars;
+	uintptr_t* playerAddress;
 };

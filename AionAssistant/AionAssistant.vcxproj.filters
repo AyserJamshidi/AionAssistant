@@ -53,7 +53,7 @@
     <ClInclude Include="src\memory\memory.hpp">
       <Filter>src\memory</Filter>
     </ClInclude>
-    <ClInclude Include="src\thread_managers\threads.hpp">
+    <ClInclude Include="include\thread_managers\threads.hpp">
       <Filter>includes</Filter>
     </ClInclude>
     <ClInclude Include="src\structures\internalstructures.hpp">
@@ -62,9 +62,45 @@
     <ClInclude Include="src\structures\aion.hpp">
       <Filter>includes</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\detours\detours.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\detours\detver.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\detours\syelog.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lauxlib.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lua.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lua.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\luaconf.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lualib.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memory\entity\AionEntity.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\helpers.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\tray\tray.h">
+      <Filter>includes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="AionAssistant.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\memory\accessors.cpp">
@@ -76,10 +112,42 @@
     <ClCompile Include="src\thread_managers\EntityMapManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="exports.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\LuaVirtualMachineManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memory\entity\AionEntity.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\InputSelfManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\get_main_hwnd.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\TrayManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\InputManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="src\cave\Assembly.asm">
       <Filter>src\cave</Filter>
     </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AionAssistant.def">
+      <Filter>src</Filter>
+    </None>
+    <None Include="dependencies\Lua542\lua54.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="dependencies\Lua542\liblua54.a" />
+    <Library Include="dependencies\detours\detours.lib" />
+    <Library Include="dependencies\detours\syelog.lib" />
   </ItemGroup>
 </Project>

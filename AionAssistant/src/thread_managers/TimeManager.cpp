@@ -1,16 +1,17 @@
+#include "../../include/thread_managers/threads.hpp"
+#include "../structures/internalstructures.hpp"
+#include "../helpers/helpers.hpp"
+
 #include <stdio.h>
 
-#include "threads.hpp"
-#include "../structures/internalstructures.hpp"
+void AionAssistantThread::TimeUpdater(void* givenStruct) {
+	GlobalVars globalVars = *(GlobalVars*)givenStruct;
+	DEBUG_PRINT("TimeManager started!\n");
 
-void AionThreads::TimeUpdater(void* givenStruct) {
-	GlobalNeeds globalNeeds = *(GlobalNeeds*)givenStruct;
-
-	while (*globalNeeds.isRunning) {
-		(*globalNeeds.currentTime)++;
-		printf("Time is now %i\n", (*globalNeeds.currentTime));
-		Sleep(1000);
+	while (*globalVars.isRunning) {
+		(*globalVars.currentTime)++;
+		Sleep(100);
 	}
 
-	printf("TimeUpdater ended!\n");
-}
+	DEBUG_PRINT("TimeManager ended!\n");
+} 
