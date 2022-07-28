@@ -1,5 +1,5 @@
 #include "../../include/thread_managers/threads.hpp"
-#include "../../dependencies/traypp/include/tray.hpp"
+#include "../../../Dependencies/traypp/include/tray.hpp"
 #include "../structures/internalstructures.hpp"
 #include <windows.h>
 #include <tchar.h>

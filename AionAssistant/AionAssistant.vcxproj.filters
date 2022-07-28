@@ -44,12 +44,6 @@
     <ClInclude Include="CodeCave\detour.h">
       <Filter>includes\codecave</Filter>
     </ClInclude>
-    <ClInclude Include="dependencies\UberSwitch\include\uberswitch.hpp">
-      <Filter>UberSwitch\include</Filter>
-    </ClInclude>
-    <ClInclude Include="dependencies\UberSwitch\include\fameta\counter.hpp">
-      <Filter>UberSwitch\include\fameta</Filter>
-    </ClInclude>
     <ClInclude Include="src\memory\memory.hpp">
       <Filter>src\memory</Filter>
     </ClInclude>
@@ -63,6 +57,12 @@
       <Filter>includes</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memory\entity\AionEntity.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\helpers.hpp">
       <Filter>includes</Filter>
     </ClInclude>
     <ClInclude Include="dependencies\detours\detours.h">
@@ -89,13 +89,13 @@
     <ClInclude Include="dependencies\Lua542\include\lualib.h">
       <Filter>includes</Filter>
     </ClInclude>
-    <ClInclude Include="src\memory\entity\AionEntity.h">
-      <Filter>includes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\helpers\helpers.hpp">
-      <Filter>includes</Filter>
-    </ClInclude>
     <ClInclude Include="dependencies\tray\tray.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\UberSwitch\include\fameta\counter.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\UberSwitch\include\uberswitch.hpp">
       <Filter>includes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -135,19 +135,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="src\cave\Assembly.asm">
-      <Filter>src\cave</Filter>
-    </MASM>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="AionAssistant.def">
       <Filter>src</Filter>
     </None>
-    <None Include="dependencies\Lua542\lua54.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="dependencies\Lua542\liblua54.a" />
-    <Library Include="dependencies\detours\detours.lib" />
-    <Library Include="dependencies\detours\syelog.lib" />
   </ItemGroup>
 </Project>

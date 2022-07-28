@@ -1,33 +1,26 @@
 // Declare project libraries
-#pragma comment(lib, "dependencies/detours/detours.lib")
-//#pragma comment(lib, "dependencies/Lua542/liblua54.a")
-#pragma comment(lib, "dependencies/traypp/tray.lib")
+#pragma comment(lib, "../x64/Release/EntityDetour.lib")
+#pragma comment(lib, "../Dependencies/Lua542/liblua54.a")
+#pragma comment(lib, "../Dependencies/traypp/tray.lib")
 
+// General dependencies
 #include <Windows.h>
 #include <string.h>
 #include <stdlib.h>
 #include <iostream> 
 #include <thread>
 #include <Psapi.h>
-#include <unordered_map>
+#include <unordered_map> 
 
-#include "Dependencies/detours/detours.h"
+// Internal dependencies
+#include "../EntityDetour/include/EntityDetour.hpp"
 #include "include/thread_managers/threads.hpp"
 #include "src/memory/memory.hpp"
 #include "src/structures/internalstructures.hpp"
 #include "src/helpers/helpers.hpp"
 
-// ASM Accessable
-extern "C" {
-	__declspec(dllexport) uintptr_t entityAddress;
-	__declspec(dllexport) uintptr_t detourEndAddress;
-	__declspec(dllexport) void EntityIntercept();
-
-	void my_hook();
-}
-
 // Non-passed variables
-uintptr_t detourStartAddress;
+AionDetour aionDetour;
 
 // Passed-along variables
 GlobalVars globalVars;
@@ -38,28 +31,22 @@ int currentTime = 0; // Used as a time reference, increments 10 times a second
 uintptr_t playerEntity;
 std::unordered_map<uintptr_t, int> entityMap;
 
-
-__declspec(dllexport) void EntityIntercept() {
-	entityMap[entityAddress] = currentTime;
-}
-
-
 void Initialize() {
 	isRunning = true;
-	DEBUG_PRINT("Initializing...\n");
+	DEBUG_PRINT_ERR("Initializing...\n");
 	globalVars = { &isRunning, &currentTime };
 
 	// Start internal timer thread
 	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::TimeUpdater, &globalVars, 0, 0));
 
 	// Start entity map cleaner thread
-	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::EntityMapManager, new EntityMapStructure{ &globalVars, &playerEntity, &entityMap}, 0, 0));
+	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::EntityMapManager, new EntityMapStructure{ &globalVars, &playerEntity, &entityMap}, 0, 0));
 
 	// Start player hotkey thread
-	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::SelfHotkeyManager, new HotkeyStructure{ &globalVars, &playerEntity }, 0, 0));
+	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::InputSelfManager, new HotkeyStructure{ &globalVars, &playerEntity }, 0, 0));
 
 	// Start tray manager thread
-	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::TrayManager, &globalVars, 0, 0));
+	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::TrayManager, &globalVars, 0, 0));
 
 	// Start input manager thread
 	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::InputManager, 0, 0, 0));
@@ -68,67 +55,55 @@ void Initialize() {
 	HMODULE cryEntitySystemModule = GetModuleHandleA("CryEntitySystem.dll");
 
 	if (cryEntitySystemModule == nullptr) {
-		printf("Could not find CryEntitySystem.dll base address.\n");
+		DEBUG_PRINT_ERR("Could not find CryEntitySystem.dll base address.\n");
 		return;
 	}
 
 	// Byte pattern scan  our entry point
-	detourStartAddress = Memory::Accessor::FindPattern(cryEntitySystemModule, "\x48\x8B\x40\x20\x48\x83\xC4\x20\x5B\xC3\xCC\xCC", "xxxxxxxxxxxx");
+	uintptr_t detourStartAddress = Memory::Accessor::FindPattern(cryEntitySystemModule, "\x48\x8B\x40\x20\x48\x83\xC4\x20\x5B\xC3\xCC\xCC", "xxxxxxxxxxxx");
 
 	if (detourStartAddress == 0) {
-		printf("Could not find pattern\n");
+		DEBUG_PRINT_ERR("Could not find pattern\n");
 		return;
 	}
 
-	// Assign address after our detoured overwritten bytes
-	printf("Address %08llX\n", detourStartAddress);
-	detourEndAddress = detourStartAddress + 8;
+	aionDetour.SetStartAddress(detourStartAddress);
+	aionDetour.SetEndAddress(detourStartAddress + 8);
+	aionDetour.SetMapAddress(&entityMap);
+	aionDetour.SetTimeAddress(&currentTime);
 
-	// Initiate hook
-	DetourTransactionBegin();
-	DetourUpdateThread(GetCurrentThread());
-	DetourAttach(&(PVOID&)detourStartAddress, my_hook);
-
-	LONG lError = DetourTransactionCommit();
-
-	if (lError != NO_ERROR) {
-		printf("[-] Failed to detour");
-		return;
-	}
-	printf("[-] Entity redirect complete!\n");
+	aionDetour.Initiate();
 }
 
 void Eject() {
 	if (!isRunning) {
-		printf("isRunning == false, rejecting isRunning == false request!\n");
+		DEBUG_PRINT_ERR("isRunning == false, rejecting isRunning == false request!\n");
 		return;
 	}
 
-	printf("Unloading...\n");
+	DEBUG_PRINT("Unloading...\n");
 	isRunning = false;
-	DetourTransactionBegin();
-	DetourUpdateThread(GetCurrentThread());
-	DetourDetach(&(PVOID&)detourStartAddress, my_hook);
-	DetourTransactionCommit();
-	printf("Done!\n");
+
+	aionDetour.Terminate();
+	DEBUG_PRINT("Done!\n");
 }
 
 void MainLoop(LPVOID lpThreadParameter) {
 	while (!GetModuleHandleW(L"CryEntitySystem.dll")) {
-		printf("Waiting for CryEntitySystem.dll...\n");
+		DEBUG_PRINT("Waiting for CryEntitySystem.dll...\n");
 		Sleep(1000);
 	}
 
 	Initialize();
 
-	printf("Starting main loop!\n");
+	DEBUG_PRINT("Starting main loop!\n");
 	while (true) {
 		if (GetKeyState(VK_RIGHT) & 0x8000)
 			Eject();
 
 		if (GetKeyState(VK_UP) & 0x8000) {
 			if (isRunning) {
-				printf("isRunning == true, rejecting init request!\n");
+				DEBUG_PRINT_ERR("isRunning == true, rejecting init request!\n");
 				continue;
 			}
 
@@ -138,7 +113,7 @@ void MainLoop(LPVOID lpThreadParameter) {
 		// https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN
 		if (GetKeyState(VK_DOWN) & 0x8000) {
 			if (isRunning) {
-				DEBUG_PRINT("isRunning == true, rejecting quit request!\n");
+				DEBUG_PRINT_ERR("isRunning == true, rejecting quit request!\n");
 				continue;
 			}
 
@@ -157,7 +132,7 @@ bool AionInitWaiter(int timeToWait) {
 	int waitedTime = 0;
 
 	while (!GetModuleHandleW(L"CryEntitySystem.dll") && waitedTime < timeToWait) {
-		//printf("Waiting for CryEntitySystem.dll...\n");
+		DEBUG_PRINT("Waiting for CryEntitySystem.dll...\n");
 		Sleep(1000);
 		waitedTime++;
 	}

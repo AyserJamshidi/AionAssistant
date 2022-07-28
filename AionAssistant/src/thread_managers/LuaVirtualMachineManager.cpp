@@ -1,9 +1,9 @@
 
 
 extern "C" {
-#include "../../dependencies/Lua542/include/lua.h"
-#include "../../dependencies/Lua542/include/lauxlib.h"
-#include "../../dependencies/Lua542/include/lualib.h"
+#include "../../../Dependencies/Lua542/include/lua.h"
+#include "../../../Dependencies/Lua542/include/lauxlib.h"
+#include "../../../Dependencies/Lua542/include/lualib.h"
 }
 
 bool CheckLua(lua_State* L, int r) {

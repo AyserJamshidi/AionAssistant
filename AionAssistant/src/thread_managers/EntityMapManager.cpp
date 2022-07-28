@@ -32,7 +32,6 @@ void AionAssistantThread::EntityMapManager(void* givenStruct) {
 				continue;
 			}
 			
-			// 
 			CEntity* ent = (CEntity*)entity->first;
 
 			if (ent->IsValidEntity() && ent->IsValidEntityObject()) {

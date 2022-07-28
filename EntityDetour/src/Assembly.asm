@@ -1,13 +1,13 @@
-PUBLIC my_hook
+PUBLIC entityDetourCode
 
 EXTERN entityAddress:QWORD
-EXTERN detourEndAddress:QWORD
+EXTERN aiondetour_EndAddress:QWORD
 ;EntityIntercept PROTO arg1:QWORD
 EntityIntercept PROTO C
 
 .CODE
 
-my_hook PROC
+entityDetourCode PROC
 	; Overwritten bytes
 	mov rax,[rax+20h]
 	add rsp,20h
@@ -19,7 +19,7 @@ my_hook PROC
     pop rax
 
 	; Jump back
-	jmp [detourEndAddress]
-my_hook ENDP
+	jmp [aiondetour_EndAddress]
+entityDetourCode ENDP
 
 END

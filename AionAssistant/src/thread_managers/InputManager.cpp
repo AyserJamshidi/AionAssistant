@@ -33,11 +33,13 @@ bool Hook_DirectInput(bool enable) {
 	IDirectInput8* pDirectInput = NULL;
 
 	if (DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&pDirectInput, NULL) != DI_OK) {
+		DEBUG_PRINT_ERR("Error occurred on keyboard DirectInput8Create\n");
 		return -1;
 	}
 
 	LPDIRECTINPUTDEVICE8 lpdiKeyboard;
 	if (pDirectInput->CreateDevice(GUID_SysKeyboard, &lpdiKeyboard, NULL) != DI_OK) {
+		DEBUG_PRINT_ERR("Error occurred on keyboard CreateDevice\n");
 		pDirectInput->Release();
 		return -1;
 	}
@@ -50,7 +52,7 @@ bool Hook_DirectInput(bool enable) {
 
 	// Attempt to acquire the device
 	if (lpdiKeyboard->Acquire() == DI_OK) {
-		printf("[+] Acquired keyboard.\n");
+		DEBUG_PRINT("Acquired keyboard.\n");
 
 		// This is how the data is returned as an array 256 bytes for each key
 		BYTE diKeys[256] = { 0 };
@@ -63,19 +65,20 @@ bool Hook_DirectInput(bool enable) {
 			if (lpdiKeyboard->GetDeviceState(256, diKeys) == DI_OK) {
 				// Check if the escape was pressed
 				if (diKeys[DIK_W] & 0x80) {
-					printf("W!\n");
+					DEBUG_PRINT("W!\n");
+					diKeys[DIK_A] = LOBYTE(0x80);
+				} else if (diKeys[DIK_Z] & 0x80) {
 					break;
-				}
-				else {
-					printf("Other key!\n");
 				}
 			}
 			// We don't need realtime access, don't flood the CPU
-			Sleep(1000);
+			Sleep(100);
 		}
 		// Unacquire the keyboard
 		lpdiKeyboard->Unacquire();
-	}
+	} else
+		DEBUG_PRINT_ERR("Failed to acquire keyboard\n");
+
 	// Free the keyboard and device objects
 	lpdiKeyboard->Release();
 	pDirectInput->Release();
