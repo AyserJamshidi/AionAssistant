@@ -8,6 +8,7 @@
 
 #define DIRECTINPUT_VERSION 0x0800
 
+// Source: https://guidedhacking.com/threads/how-to-hook-directinput-emulate-key-presses.14011/
 void* HookVTableFunction(void* pVTable, void* fnHookFunc, int nOffset) {
 	intptr_t ptrVtable = *((intptr_t*)pVTable); // Pointer to our chosen vtable
 	intptr_t ptrFunction = ptrVtable + sizeof(intptr_t) * nOffset; // The offset to the function (remember it's a zero indexed array with a size of four bytes)
@@ -44,33 +45,67 @@ bool Hook_DirectInput(bool enable) {
 		return -1;
 	}
 
-	// Set the data type to keyboard
 	lpdiKeyboard->SetDataFormat(&c_dfDIKeyboard);
+	lpdiKeyboard->SetCooperativeLevel(GetActiveWindow(), DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
 
-	// We want non-exclusive access i.e sharing it with other applications
-	lpdiKeyboard->SetCooperativeLevel(GetActiveWindow(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	// Setup config for buffered output
+	DIPROPDWORD  dipdw = { 0 };
+	dipdw.diph.dwSize = sizeof(DIPROPDWORD);
+	dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+	dipdw.diph.dwObj = 0;
+	dipdw.diph.dwHow = DIPH_DEVICE;
+	dipdw.dwData = 10;
+
+	// Attempt to switch to buffered output
+	if (lpdiKeyboard->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph) == DI_OK)
+		DEBUG_PRINT("Buffered mode enabled for device\n");
+
+	// Trip flag
+	bool bEscape = false;
 
 	// Attempt to acquire the device
 	if (lpdiKeyboard->Acquire() == DI_OK) {
 		DEBUG_PRINT("Acquired keyboard.\n");
 
-		// This is how the data is returned as an array 256 bytes for each key
-		BYTE diKeys[256] = { 0 };
-
-		// Start looping and grabbing the data from the device
-		while (1) {
+		while (true) {
 			// Poll for new data
 			lpdiKeyboard->Poll();
-			// Get the state -- https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ee418641(v%3Dvs.85)
-			if (lpdiKeyboard->GetDeviceState(256, diKeys) == DI_OK) {
-				// Check if the escape was pressed
-				if (diKeys[DIK_W] & 0x80) {
-					DEBUG_PRINT("W!\n");
-					diKeys[DIK_A] = LOBYTE(0x80);
-				} else if (diKeys[DIK_Z] & 0x80) {
-					break;
+
+			// We asked for 10 objects at a time
+			DIDEVICEOBJECTDATA didod[10] = { 0 };
+			DWORD dwNumElements = 10;
+
+			// Get the data
+			HRESULT hr = lpdiKeyboard->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), didod, &dwNumElements, 0);
+			if (hr == DI_OK) {
+				// Process the keystrokes
+				for (DWORD i = 0; i < dwNumElements; i++) {
+					if (LOBYTE(didod[i].dwData) > 0) {
+						switch (didod[i].dwOfs) {
+							case DIK_W:
+								didod[i].dwOfs = DIK_S;
+								printf("[W]");
+								break;
+							case DIK_S:
+								printf("[S]");
+								break;
+							case DIK_A:
+								printf("[A]");
+								break;
+							case DIK_D:
+								printf("[D]");
+								break;
+							case DIK_Z:
+								break;
+						}
+					}
 				}
 			}
+
+			// Trip flag hit
+			if (bEscape)
+				break;
+
 			// We don't need realtime access, don't flood the CPU
 			Sleep(100);
 		}
