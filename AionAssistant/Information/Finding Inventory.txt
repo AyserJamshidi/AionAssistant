@@ -1,0 +1,10 @@
+https://www.elitepvpers.com/forum/aion/3768371-aion-offsets-help-2.html#post32375462
+
+Like The Target Methode You Search For The Inventory Base Adress Then Offsets For Current/MaxCube / Kinah / Special Cube Etc...
+For Example This Is For NA 4.8
+Inventory Adress = Game.dll+E8A1F8
+Current Slots = 0x910
+Max Slots = 0x920
+Current Special Cube = 0x970
+Max Special Cube = 0x940
+Kinah = 0x8F8

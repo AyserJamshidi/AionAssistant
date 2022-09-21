@@ -1,0 +1,9 @@
+LIBRARY VERSION
+EXPORTS
+
+acmStreamOpen = zzacmStreamOpen
+acmFormatSuggest = zzacmFormatSuggest
+acmStreamUnprepareHeader = zzacmStreamUnprepareHeader
+acmStreamConvert = zzacmStreamConvert
+acmStreamPrepareHeader = zzacmStreamPrepareHeader
+acmStreamSize = zzacmStreamSize

@@ -1,0 +1,7 @@
+1) Download x64dbg
+2) Download Themidie -- https://github.com/VenTaz/Themidie
+3) Download ScyllaHide -- https://github.com/x64dbg/ScyllaHide
+4) Import both into x64dbg
+5) Disable every ScyllaHide option except for "Kill Anti-Attach"
+6) Follow instructions for making two Aion executables and necessary REGEDIT modifications here -- https://stackoverflow.com/questions/40406225/how-to-add-parameters-to-a-running-process-or-exe-by-default/72427580#72427580
+7) Use Themidie plugin to start Aion.exe

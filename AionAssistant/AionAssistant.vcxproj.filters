@@ -24,8 +24,11 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="src\codecave">
+    <Filter Include="src\cave">
       <UniqueIdentifier>{658729e1-396d-4174-9fc5-95bd17c9f2f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\memory">
+      <UniqueIdentifier>{96aaeba0-7fca-40bf-a1d1-bb6c6351754e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -41,21 +44,99 @@
     <ClInclude Include="CodeCave\detour.h">
       <Filter>includes\codecave</Filter>
     </ClInclude>
-    <ClInclude Include="UberSwitch\include\uberswitch.hpp">
-      <Filter>UberSwitch\include</Filter>
+    <ClInclude Include="src\memory\memory.hpp">
+      <Filter>src\memory</Filter>
     </ClInclude>
-    <ClInclude Include="UberSwitch\include\fameta\counter.hpp">
-      <Filter>UberSwitch\include\fameta</Filter>
+    <ClInclude Include="include\thread_managers\threads.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\structures\internalstructures.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\structures\aion.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\memory\entity\AionEntity.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\helpers.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\detours\detours.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\detours\detver.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\detours\syelog.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lauxlib.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lua.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lua.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\luaconf.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\Lua542\include\lualib.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\tray\tray.h">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\UberSwitch\include\fameta\counter.hpp">
+      <Filter>includes</Filter>
+    </ClInclude>
+    <ClInclude Include="dependencies\UberSwitch\include\uberswitch.hpp">
+      <Filter>includes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="AionAssistant.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memory\accessors.cpp">
+      <Filter>src\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\TimeManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\EntityMapManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="exports.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\LuaVirtualMachineManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memory\entity\AionEntity.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\InputSelfManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\get_main_hwnd.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\TrayManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\InputManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="CodeCave\Assembly.asm">
-      <Filter>src\codecave</Filter>
-    </MASM>
+    <None Include="AionAssistant.def">
+      <Filter>src</Filter>
+    </None>
   </ItemGroup>
 </Project>
