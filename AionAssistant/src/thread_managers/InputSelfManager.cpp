@@ -1,9 +1,9 @@
 #include "../../include/thread_managers/threads.hpp"
 #include "../structures/internalstructures.hpp"
 #include "../memory/entity/AionEntity.h"
-#include "../helpers/helpers.hpp"
 
 #include <stdio.h>
+#include "../../../Generics/helpers.hpp"
 
 void AionAssistantThread::InputSelfManager(void* givenStruct) {
 	HotkeyStructure hotkeyStructure = *(HotkeyStructure*)givenStruct;

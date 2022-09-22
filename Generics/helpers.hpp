@@ -2,9 +2,9 @@
 #include <Windows.h>
 #include <string>
 
-#define DEBUG 1
+// #define DEBUG 1
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_PRINT(...) {\
 printf("[+] "); \
 printf(__VA_ARGS__); \
@@ -17,6 +17,7 @@ printf(__VA_ARGS__); \
 
 #else
 #define DEBUG_PRINT(...)
+#define DEBUG_PRINT_ERR(...)
 #endif
 
 class Helpers {

@@ -1,8 +1,8 @@
 #include "../../include/thread_managers/threads.hpp"
 #include "../structures/internalstructures.hpp"
-#include "../helpers/helpers.hpp"
 
 #include <stdio.h>
+#include "../../../Generics/helpers.hpp"
 
 void AionAssistantThread::TimeUpdater(void* givenStruct) {
 	GlobalVars globalVars = *(GlobalVars*)givenStruct;

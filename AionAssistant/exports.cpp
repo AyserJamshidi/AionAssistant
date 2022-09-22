@@ -15,6 +15,10 @@ void* FindRealAddress(PCSTR name) {
 		s_realVersionModule = LoadLibrary(path);
 	}
 
+	// TODO ???
+	if (s_realVersionModule == 0)
+		return 0;
+
 	return GetProcAddress(s_realVersionModule, name);
 }
 
