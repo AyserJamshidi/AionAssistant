@@ -52,7 +52,7 @@ bool AionDetour::Initiate() {
 	}
 
 	if (aiondetour_EntityMap == 0) {
-		DEBUG_PRINT_ERR("Failed to detour");
+		DEBUG_PRINT_ERR("Entity map is not set for detour.");
 		return false;
 	}
 
