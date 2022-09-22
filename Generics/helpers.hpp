@@ -6,11 +6,13 @@
 
 #ifdef _DEBUG
 #define DEBUG_PRINT(...) {\
+SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11); \
 printf("[+] "); \
 printf(__VA_ARGS__); \
 }
 
 #define DEBUG_PRINT_ERR(...) {\
+SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12); \
 printf("[-] "); \
 printf(__VA_ARGS__); \
 }

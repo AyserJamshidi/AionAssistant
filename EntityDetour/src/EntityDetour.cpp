@@ -42,17 +42,17 @@ void AionDetour::SetTimeAddress(int* givenTime) {
 
 bool AionDetour::Initiate() {
 	if (aiondetour_StartAddress == 0) {
-		DEBUG_PRINT_ERR("[-] Start address is not set for detour.");
+		DEBUG_PRINT_ERR("Start address is not set for detour.");
 		return false;
 	}
 
 	if (aiondetour_EndAddress == 0) {
-		DEBUG_PRINT_ERR("[-] End address is not set for detour.");
+		DEBUG_PRINT_ERR("End address is not set for detour.");
 		return false;
 	}
 
 	if (aiondetour_EntityMap == 0) {
-		DEBUG_PRINT_ERR("[-] Failed to detour");
+		DEBUG_PRINT_ERR("Failed to detour");
 		return false;
 	}
 
@@ -64,11 +64,11 @@ bool AionDetour::Initiate() {
 	LONG lError = DetourTransactionCommit();
 
 	if (lError != NO_ERROR) {
-		DEBUG_PRINT_ERR("[-] Failed to detour");
+		DEBUG_PRINT_ERR("Failed to detour");
 		return false;
 	}
 
-	DEBUG_PRINT("[+] Entity redirect complete!\n");
+	DEBUG_PRINT("Entity redirect complete!\n");
 }
 
 void AionDetour::Terminate() {

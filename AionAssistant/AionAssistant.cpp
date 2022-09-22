@@ -41,7 +41,7 @@ std::unordered_map<uintptr_t, int> entityMap;
 
 void Initialize() {
 	isRunning = true;
-	DEBUG_PRINT_ERR("Initializing...\n");
+	DEBUG_PRINT("Initializing...\n");
 	globalVars = { &isRunning, &currentTime };
 
 	// Start internal timer thread

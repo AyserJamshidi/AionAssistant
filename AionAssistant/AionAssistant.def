@@ -1,4 +1,4 @@
-LIBRARY VERSION
+LIBRARY msacm32
 EXPORTS
 
 acmStreamOpen = zzacmStreamOpen
