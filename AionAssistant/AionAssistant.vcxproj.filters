@@ -62,9 +62,6 @@
     <ClInclude Include="src\memory\entity\AionEntity.h">
       <Filter>includes</Filter>
     </ClInclude>
-    <ClInclude Include="src\helpers\helpers.hpp">
-      <Filter>includes</Filter>
-    </ClInclude>
     <ClInclude Include="dependencies\detours\detours.h">
       <Filter>includes</Filter>
     </ClInclude>
@@ -106,9 +103,6 @@
     <ClCompile Include="src\memory\accessors.cpp">
       <Filter>src\memory</Filter>
     </ClCompile>
-    <ClCompile Include="src\thread_managers\TimeManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\thread_managers\EntityMapManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -124,13 +118,10 @@
     <ClCompile Include="src\thread_managers\InputSelfManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\helpers\get_main_hwnd.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\thread_managers\TrayManager.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\thread_managers\InputManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\thread_managers\TimeManager.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

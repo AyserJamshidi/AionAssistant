@@ -2,11 +2,11 @@
 #pragma comment(lib, "dinput8.lib") // Required for keyboard hooking stuff
 
 #include "../../include/thread_managers/threads.hpp"
-#include "../helpers/helpers.hpp"
 
 #include <dinput.h>
+#include "../../../Generics/helpers.hpp"
 
-#define DIRECTINPUT_VERSION 0x0800
+// #define DIRECTINPUT_VERSION 0x0800
 
 // Source: https://guidedhacking.com/threads/how-to-hook-directinput-emulate-key-presses.14011/
 void* HookVTableFunction(void* pVTable, void* fnHookFunc, int nOffset) {
@@ -35,14 +35,14 @@ bool Hook_DirectInput(bool enable) {
 
 	if (DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)&pDirectInput, NULL) != DI_OK) {
 		DEBUG_PRINT_ERR("Error occurred on keyboard DirectInput8Create\n");
-		return -1;
+		return false;
 	}
 
 	LPDIRECTINPUTDEVICE8 lpdiKeyboard;
 	if (pDirectInput->CreateDevice(GUID_SysKeyboard, &lpdiKeyboard, NULL) != DI_OK) {
 		DEBUG_PRINT_ERR("Error occurred on keyboard CreateDevice\n");
 		pDirectInput->Release();
-		return -1;
+		return false;
 	}
 
 	lpdiKeyboard->SetDataFormat(&c_dfDIKeyboard);

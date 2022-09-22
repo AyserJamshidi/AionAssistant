@@ -1,3 +1,4 @@
+#include "pch.h"
 #pragma comment(lib, "../Dependencies/detours/detours.lib")
 
 #include "../include/EntityDetour.hpp"
@@ -5,6 +6,7 @@
 
 #include <stdio.h>
 #include <unordered_map>
+#include "../../Generics/helpers.hpp"
 
 extern "C" { // ASM Accessable
 	__declspec(dllexport) uintptr_t entityAddress;
@@ -40,17 +42,17 @@ void AionDetour::SetTimeAddress(int* givenTime) {
 
 bool AionDetour::Initiate() {
 	if (aiondetour_StartAddress == 0) {
-		printf("[-] Start address is not set for detour.");
+		DEBUG_PRINT_ERR("Start address is not set for detour.");
 		return false;
 	}
 
 	if (aiondetour_EndAddress == 0) {
-		printf("[-] End address is not set for detour.");
+		DEBUG_PRINT_ERR("End address is not set for detour.");
 		return false;
 	}
 
 	if (aiondetour_EntityMap == 0) {
-		printf("[-] Failed to detour");
+		DEBUG_PRINT_ERR("Failed to detour");
 		return false;
 	}
 
@@ -62,10 +64,11 @@ bool AionDetour::Initiate() {
 	LONG lError = DetourTransactionCommit();
 
 	if (lError != NO_ERROR) {
-		printf("[-] Failed to detour");
+		DEBUG_PRINT_ERR("Failed to detour");
 		return false;
 	}
-	printf("[+] Entity redirect complete!\n");
+
+	DEBUG_PRINT("Entity redirect complete!\n");
 }
 
 void AionDetour::Terminate() {

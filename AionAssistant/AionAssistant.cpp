@@ -1,7 +1,14 @@
 // Declare project libraries
+
+#ifdef _DEBUG
+#pragma comment(lib, "../x64/Debug/Generics.lib")
+#pragma comment(lib, "../x64/Debug/EntityDetour.lib")
+#else
+#pragma comment(lib, "../x64/Release/Generics.lib")
 #pragma comment(lib, "../x64/Release/EntityDetour.lib")
-#pragma comment(lib, "../Dependencies/Lua542/liblua54.a")
-#pragma comment(lib, "../Dependencies/traypp/tray.lib")
+#endif
+
+//#pragma comment(lib, "../Dependencies/Lua542/liblua54.a")
 
 // General dependencies
 #include <Windows.h>
@@ -17,7 +24,8 @@
 #include "include/thread_managers/threads.hpp"
 #include "src/memory/memory.hpp"
 #include "src/structures/internalstructures.hpp"
-#include "src/helpers/helpers.hpp"
+#include "../Generics/helpers.hpp"
+//#include "src/helpers/helpers.hpp"
 
 // Non-passed variables
 AionDetour aionDetour;
@@ -33,7 +41,7 @@ std::unordered_map<uintptr_t, int> entityMap;
 
 void Initialize() {
 	isRunning = true;
-	DEBUG_PRINT_ERR("Initializing...\n");
+	DEBUG_PRINT("Initializing...\n");
 	globalVars = { &isRunning, &currentTime };
 
 	// Start internal timer thread
@@ -49,7 +57,7 @@ void Initialize() {
 	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::TrayManager, &globalVars, 0, 0));
 
 	// Start input manager thread
-	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::InputManager, 0, 0, 0));
+	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::InputManager, 0, 0, 0));
 
 	// Get CryEntitySystem module
 	HMODULE cryEntitySystemModule = GetModuleHandleA("CryEntitySystem.dll");
