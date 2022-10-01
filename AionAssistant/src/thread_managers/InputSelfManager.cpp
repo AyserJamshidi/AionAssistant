@@ -55,7 +55,7 @@ void AionAssistantThread::InputSelfManager(void* givenStruct) {
 			z++; 
 
 		if (GetAsyncKeyState(VK_F1))
-			AionEntity::NoGravity(playerEntity, true);*/
+			AionEntity::SetNoGravity(playerEntity, true);*/
 	
 		Sleep(200);
 	}

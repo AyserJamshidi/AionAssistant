@@ -1,4 +1,4 @@
-// Declare project libraries
+// Project libraries
 
 #ifdef _DEBUG
 #pragma comment(lib, "../x64/Debug/Generics.lib")
@@ -8,7 +8,7 @@
 #pragma comment(lib, "../x64/Release/EntityDetour.lib")
 #endif
 
-//#pragma comment(lib, "../Dependencies/Lua542/liblua54.a")
+#pragma comment(lib, "../Dependencies/Lua542/liblua54.a")
 
 // General dependencies
 #include <Windows.h>
@@ -21,21 +21,20 @@
 
 // Internal dependencies
 #include "../EntityDetour/include/EntityDetour.hpp"
+#include "../Generics/helpers.hpp"
 #include "include/thread_managers/threads.hpp"
 #include "src/memory/memory.hpp"
 #include "src/structures/internalstructures.hpp"
-#include "../Generics/helpers.hpp"
-//#include "src/helpers/helpers.hpp"
 
 // Non-passed variables
 AionDetour aionDetour;
 
-// Passed-along variables
+// Passed-along/Shared variables
 GlobalVars globalVars;
 bool isRunning = false; // Program threads rely on this to stay on/turn off
 int currentTime = 0; // Used as a time reference, increments 10 times a second
 
-// Entity containers
+// Shared entity containers
 uintptr_t playerEntity;
 std::unordered_map<uintptr_t, int> entityMap;
 
@@ -48,16 +47,16 @@ void Initialize() {
 	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::TimeUpdater, &globalVars, 0, 0));
 
 	// Start entity map cleaner thread
-	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::EntityMapManager, new EntityMapStructure{ &globalVars, &playerEntity, &entityMap}, 0, 0));
+	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::EntityMapManager, new EntityMapStructure{ &globalVars, &playerEntity, &entityMap }, 0, 0));
 
 	// Start player hotkey thread
 	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::InputSelfManager, new HotkeyStructure{ &globalVars, &playerEntity }, 0, 0));
 
-	// Start tray manager thread
-	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::TrayManager, &globalVars, 0, 0));
-
 	// Start input manager thread
 	//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::InputManager, 0, 0, 0));
+	
+	// Start LUA VM Manager
+	CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)AionAssistantThread::LuaVirtualMachineManager, 0, 0, 0));
 
 	// Get CryEntitySystem module
 	HMODULE cryEntitySystemModule = GetModuleHandleA("CryEntitySystem.dll");
@@ -67,8 +66,9 @@ void Initialize() {
 		return;
 	}
 
-	// Byte pattern scan  our entry point
-	uintptr_t detourStartAddress = Memory::Accessor::FindPattern(cryEntitySystemModule, "\x48\x8B\x40\x20\x48\x83\xC4\x20\x5B\xC3\xCC\xCC", "xxxxxxxxxxxx");
+	// TODO https://stackoverflow.com/questions/940707/how-do-i-programmatically-get-the-version-of-a-dll-or-exe-file
+	// Product Version 4515.0319.0112.8880 entry point
+	uintptr_t detourStartAddress = Memory::Accessor::FindPattern(cryEntitySystemModule, "\x48\x8B\x40\x20\x48\x83\xC4\x20\x5B\xC3\xCC\xCC", "xxxxxxxxxxxx"); // Byte pattern scan
 
 	if (detourStartAddress == 0) {
 		DEBUG_PRINT_ERR("Could not find pattern\n");
@@ -162,8 +162,7 @@ int __stdcall DllMain(_In_ HMODULE hModule, _In_ DWORD fdwReason, _In_ LPVOID lp
 		//hwnd = Helpers::GetMainHWND();
 
 		CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)MainLoop, hModule, 0, 0));
-	}
-	else
+	} else
 		FreeLibrary(hModule);
 
 	return true;

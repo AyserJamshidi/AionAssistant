@@ -13,5 +13,6 @@ void AionAssistantThread::TimeUpdater(void* givenStruct) {
 		Sleep(100);
 	}
 
+
 	DEBUG_PRINT("TimeManager ended!\n");
 } 
