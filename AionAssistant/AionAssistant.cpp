@@ -17,6 +17,7 @@
 #include <iostream> 
 #include <thread>
 #include <Psapi.h>
+#include <unordered_set>
 #include <unordered_map> 
 
 // Internal dependencies
@@ -37,6 +38,23 @@ int currentTime = 0; // Used as a time reference, increments 10 times a second
 // Shared entity containers
 uintptr_t playerEntity;
 std::unordered_map<uintptr_t, int> entityMap;
+
+// Utility function
+bool AionInitWaiter(int timeToWait) {
+	int waitedTime = 0;
+
+	while(!GetModuleHandleW(L"CryEntitySystem.dll") && waitedTime < timeToWait) {
+		DEBUG_PRINT("Waiting for CryEntitySystem.dll...\n");
+		Sleep(1000);
+		waitedTime++;
+	}
+
+	/* Will return false if we've exceeded our timer.
+	 *
+	 * Typically will only return false if Aion has crashed or hangs forever during startup.
+	 */
+	return waitedTime < 60;
+}
 
 void Initialize() {
 	isRunning = true;
@@ -97,10 +115,7 @@ void Eject() {
 }
 
 void MainLoop(LPVOID lpThreadParameter) {
-	while (!GetModuleHandleW(L"CryEntitySystem.dll")) {
-		DEBUG_PRINT("Waiting for CryEntitySystem.dll...\n");
-		Sleep(1000);
-	}
+	AionInitWaiter(60000);
 
 	Initialize();
 
@@ -136,22 +151,6 @@ void MainLoop(LPVOID lpThreadParameter) {
 	return;
 }
 
-bool AionInitWaiter(int timeToWait) {
-	int waitedTime = 0;
-
-	while (!GetModuleHandleW(L"CryEntitySystem.dll") && waitedTime < timeToWait) {
-		DEBUG_PRINT("Waiting for CryEntitySystem.dll...\n");
-		Sleep(1000);
-		waitedTime++;
-	}
-
-	/* Will return false if we've exceeded our timer.
-	 *
-	 * Typically will only return false if Aion has crashed or hangs forever during startup.
-	 */
-	return waitedTime < 60;
-}
-
 int __stdcall DllMain(_In_ HMODULE hModule, _In_ DWORD fdwReason, _In_ LPVOID lpReserved) {
 	//DisableThreadLibraryCalls(hModule);
 
@@ -161,7 +160,22 @@ int __stdcall DllMain(_In_ HMODULE hModule, _In_ DWORD fdwReason, _In_ LPVOID lp
 		freopen_s(&pCout, "CONOUT$", "w", stdout);
 		//hwnd = Helpers::GetMainHWND();
 
-		CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)MainLoop, hModule, 0, 0));
+		HANDLE process = GetCurrentProcess();
+
+		std::unordered_set<int> desiredCores = { 0, 2, 4, 6, 8, 10 };
+		DWORD_PTR newProcessMask = 0;
+
+		// Add all cores to the mask
+		for(int curCore : desiredCores)
+			newProcessMask += pow(2, curCore);
+
+		std::cout << "Mask: " << std::hex << newProcessMask << std::dec << std::endl;
+
+		BOOL success = SetProcessAffinityMask(process, newProcessMask);
+
+		std::cout << success << std::endl;
+
+		//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)MainLoop, hModule, 0, 0));
 	} else
 		FreeLibrary(hModule);
 
