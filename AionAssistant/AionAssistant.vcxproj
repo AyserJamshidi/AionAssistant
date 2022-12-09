@@ -181,7 +181,7 @@
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <AdditionalOptions>/pdbaltpath:%_PDB% %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>dbghelp.lib;Ws2_32.lib;C:\Users\Ace\source\repos\AyserJamshidi\AionAssistant\Dependencies\detours\detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dbghelp.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_AMD64_</PreprocessorDefinitions>

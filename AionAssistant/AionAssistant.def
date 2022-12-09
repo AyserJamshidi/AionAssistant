@@ -1,9 +1,6 @@
-LIBRARY msacm32
+LIBRARY dxgi.dll
 EXPORTS
 
-acmStreamOpen = zzacmStreamOpen
-acmFormatSuggest = zzacmFormatSuggest
-acmStreamUnprepareHeader = zzacmStreamUnprepareHeader
-acmStreamConvert = zzacmStreamConvert
-acmStreamPrepareHeader = zzacmStreamPrepareHeader
-acmStreamSize = zzacmStreamSize
+CreateDXGIFactory   = zzCreateDXGIFactory
+CreateDXGIFactory1  = zzCreateDXGIFactory1
+CreateDXGIFactory2  = zzCreateDXGIFactory2
