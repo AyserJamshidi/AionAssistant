@@ -1,110 +1,108 @@
+// #![feature(once_cell)] // Required for Lazy_Lock experimental feature
+#![feature(asm_const)]
+
+mod lib_runner;
+mod aion_assistant;
+mod aion;
+
 use std::error::Error;
-use std::thread::sleep;
-use std::time::Duration;
-#[cfg(not(target_os = "windows"))]
-compile_error!("This is a windows only lib");
+use std::ffi::c_void;
+use debug_print::{debug_eprintln, debug_println};
+use hudhook::reexports::{DLL_PROCESS_ATTACH, FreeConsole};
+use msgbox::IconType;
+use windows::Win32::Foundation::HINSTANCE;
+use windows::Win32::System::Console::{AllocConsole, SetConsoleTitleA};
+use windows::Win32::System::LibraryLoader::{DisableThreadLibraryCalls, FreeLibraryAndExitThread};
+use windows::Win32::System::Threading::{CreateThread, THREAD_CREATION_FLAGS};
 
-// * SRC: https://www.unknowncheats.me/forum/rust-language-/330583-pure-rust-injectable-dll.html
+/*
+    Useful sources:
+    https://guidedhacking.com/threads/game-hacking-in-rust.15578/
+    https://www.unknowncheats.me/forum/rust-language-/514796-game-memory-hacking-libraries-rust.html
+    https://www.unknowncheats.me/forum/rust-language-/330583-pure-rust-injectable-dll.html
+    https://github.com/pseuxide/toy-arms
+    https://github.com/steele123/mem-rs
 
-// Create DllMain and a new thread which will run lib_test
-// fn dll_attach(_base: winapi::shared::minwindef::LPVOID) -> Result<(), Box<dyn Error>> {
-fn dll_attach(_base: winapi::shared::minwindef::LPVOID) -> Result<(), Box<dyn Error>> {
-    // let process = std::process::GameProcess::current_process();
-    // prints stuff to the console of where it was ran; this also works on non-games!
-    println!("this was injected by Rust!");
+    Nav Mesh stuff:
+    https://github.com/zzsort/monono2/blob/25eabe693a02ad999ec7574155e1448611c0a04a/ALGeoBuilder/NavMeshProcessor.cs#L16
+    https://github.com/AionGermany/aion-germany/blob/master/AL-Game/src/com/aionemu/gameserver/world/WorldMapType.java
+    https://github.com/zzsort/monono2/issues/1
 
-    // ok this worked out fine; say that it all went ok
-    Ok(())
+    Other:
+    https://stackoverflow.com/questions/40406225/how-to-add-parameters-to-a-running-process-or-exe-by-default
+ */
+
+fn dll_attach(hmodule_dll: *mut c_void) -> Result<(), Box<dyn Error>> {
+	lib_runner::main_loop(hmodule_dll);
+
+	// Return OK as main_loop has ended.
+	Ok(())
 }
 
-// make a wrapper which has to be unsafe to use and also depends on the system's own calling methodology
-unsafe extern "system" fn dll_attach_wrapper(base: winapi::shared::minwindef::LPVOID) -> u32 {
-    // make sure that when attached, it doesn't fuck us over somehow (thru panicking)
-    match std::panic::catch_unwind(|| dll_attach(base)) {
-        Err(e) => {
-            eprintln!("`dll_attach` has panicked: {:#?}", e);
-        }
+// Wrapper which has to be unsafe to use and also depends on the system's own calling methodology
+extern "system" fn dll_attach_wrapper(base: *mut c_void) -> u32 {
+	// make sure that when attached, it doesn't fuck us over somehow (thru panicking)
+	match std::panic::catch_unwind(|| dll_attach(base)) {
+		Err(e) => {
+			debug_eprintln!("`dll_attach` has panicked: {:#?}", e);
+		}
 
-        Ok(r) => match r {
-            Ok(()) => {}
-            Err(e) => { // something went wrong without panicking; time to tell us what it is and potentially diagnose
-                eprintln!("`dll_attach` returned an Err: {:#?}", e);
-            }
-        },
-    }
+		Ok(r) => match r {
+			Ok(()) => {}
+			Err(e) => {
+				// something went wrong without panicking; time to tell us what it is and potentially diagnose
+				debug_eprintln!("Error!");
+				debug_eprintln!("Error!");
+				debug_eprintln!("Error!");
+				debug_eprintln!("Error!");
+				debug_eprintln!("Error!");
+				debug_eprintln!("`dll_attach` returned an Err: {:#?}", e);
+				msgbox::create("Title", &*e.to_string(), IconType::Error).unwrap();
+				std::thread::sleep(std::time::Duration::from_secs(5));
+			}
+		},
+	}
 
-    // for the DLL not to instantly stop, block the dll_attach function
-    // make sure that when detaching, it doesn't fuck us over somehow (thru panicking)
-    // match std::panic::catch_unwind(|| dll_detach()) {
-    //     Err(e) => {
-    //         eprintln!("`dll_detach` has panicked: {:#?}", e);
-    //     }
-
-    //     Ok(r) => match r {
-    //         Ok(()) => {}
-    //         Err(e) => {
-    //             eprintln!("`dll_detach` returned an Err: {:#?}", e);
-    //         }
-    //     },
-    // }
-
-    // free the lib and exit the thread.
-    // the thread should just stop working now
-    println!("Attach called in {}", std::process::id());
-    sleep(Duration::from_secs(1));
-
-    println!("Closing!");
-    sleep(Duration::from_secs(1));
-    winapi::um::wincon::FreeConsole();
-    winapi::um::libloaderapi::FreeLibraryAndExitThread(base as _, 1);
-
-    // in the case that windows is a fuckwit, panic
-    unreachable!()
+	debug_println!("Detaching!!");
+	std::thread::sleep(std::time::Duration::from_secs(2));
+	unsafe {
+		// Detach the console, free the lib and exit this thread.
+		FreeConsole();
+		FreeLibraryAndExitThread(HINSTANCE(base as isize), 1);
+	}
 }
 
 #[no_mangle] // call it "DllMain" in the compiled DLL
-pub extern "stdcall" fn DllMain(
-    hmodule_dll: winapi::shared::minwindef::HMODULE,
-    fdw_reason: winapi::shared::minwindef::DWORD,
-    lpv_reserved: winapi::shared::minwindef::LPVOID,
-) -> i32 {
-    match fdw_reason { // match for what reason it's calling us
-        winapi::um::winnt::DLL_PROCESS_ATTACH => {
-            unsafe {
-                // Create command prompt window
-                winapi::um::consoleapi::AllocConsole();
+pub extern "stdcall" fn DllMain(hmodule_dll: HINSTANCE, fdw_reason: u32, _lpv_reserved: *mut c_void) -> i32 {
+	if fdw_reason == DLL_PROCESS_ATTACH { // DLL_PROCESS_ATTACH == 1
+		hudhook::lifecycle::global_state::set_module(hudhook::reexports::HINSTANCE(hmodule_dll.0));
 
-                //
-                winapi::um::libloaderapi::DisableThreadLibraryCalls(hmodule_dll);
+		unsafe {
+			// Create debug terminal if in debug mode
+			if cfg!(debug_assertions) {
+				AllocConsole();
 
-                // Create thread
-                winapi::um::processthreadsapi::CreateThread(
-                    std::ptr::null_mut(),
-                    0,
-                    Some(dll_attach_wrapper),
-                    hmodule_dll as _,
-                    0,
-                    std::ptr::null_mut(),
-                );
-            }
-            return true as i32; // say it went a-ok
-        }
-        winapi::um::winnt::DLL_PROCESS_DETACH => { // start detaching
-            if !lpv_reserved.is_null() {
-                //         match std::panic::catch_unwind(|| dll_detach()) {
-                //             Err(e) => {
-                //                 eprintln!("`dll_detach` has panicked: {:#?}", e);
-                //             }
-                //             Ok(r) => match r {
-                //                 Ok(()) => {}
-                //                 Err(e) => {
-                //                     eprintln!("`dll_detach` returned an Err: {:#?}", e);
-                //                 }
-                //             },
-                //         }
-            }
-            return true as i32;
-        }
-        _ => true as i32, // it went a-ok because we dont know what happened so lol fuck off
-    }
+				// Set console title
+				SetConsoleTitleA(windows::s!("AionAssistant-Rust dbg console"));
+			}
+
+			debug_println!("AionAssistant-Rust injected!");
+
+			// TODO: What does this do exactly?
+			DisableThreadLibraryCalls(hmodule_dll);
+
+			// Create thread.  TODO: Does this create a leaking handle?
+			CreateThread(
+				Some(0 as _),
+				0,
+				Some(dll_attach_wrapper),
+				Some(hmodule_dll.0 as *const c_void),
+				THREAD_CREATION_FLAGS(0),
+				Some(0 as _),
+			).unwrap();
+		}
+		debug_println!("AionAssistant-Rust finished!");
+	}
+
+	true as i32
 }
