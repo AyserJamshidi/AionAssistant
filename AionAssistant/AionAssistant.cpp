@@ -176,6 +176,35 @@ int __stdcall DllMain(_In_ HMODULE hModule, _In_ DWORD fdwReason, _In_ LPVOID lp
 		std::cout << success << std::endl;
 
 		//CloseHandle(CreateThread(0, 0, (LPTHREAD_START_ROUTINE)MainLoop, hModule, 0, 0));
+
+
+		std::cout << "Loading!" << std::endl;
+		LPCSTR DllPath = "C:\\Users\\Ace\\source\\repos\\AyserJamshidi\\AionAssistant\\AionAssistant-rs\\target\\debug\\aion_assistant.dll"; // The Path to our DLL
+
+		BOOL WPM = 0;
+
+		HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, 0, GetCurrentProcessId());
+		if(hProc == INVALID_HANDLE_VALUE) {
+			return -1;
+		}
+		void* loc = VirtualAllocEx(hProc, 0, MAX_PATH, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		WPM = WriteProcessMemory(hProc, loc, DllPath, strlen(DllPath) + 1, 0);
+		if(!WPM) {
+			CloseHandle(hProc);
+			return -1;
+		}
+		std::cout << "DLL Injected Succesfully 0x" << WPM << std::endl;
+		HANDLE hThread = CreateRemoteThread(hProc, 0, 0, (LPTHREAD_START_ROUTINE)LoadLibraryA, loc, 0, 0);
+		if(!hThread) {
+			VirtualFree(loc, strlen(DllPath) + 1, MEM_RELEASE);
+			CloseHandle(hProc);
+			return -1;
+		}
+		std::cout << "Thread Created Succesfully 0x" << hThread << std::endl;
+		CloseHandle(hProc);
+		VirtualFree(loc, strlen(DllPath) + 1, MEM_RELEASE);
+		CloseHandle(hThread);
+
 	} else
 		FreeLibrary(hModule);
 
