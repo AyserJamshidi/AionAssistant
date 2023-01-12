@@ -1,17 +1,20 @@
 use std::collections::HashMap;
-use std::ffi::c_void;
 use std::sync::{Arc, Mutex};
 use active_win_pos_rs::get_active_window;
-use debug_print::{debug_eprintln, debug_println};
+use debug_print::debug_println;
+use hudhook::hooks::{Hooks, ImguiRenderLoop};
+use hudhook::hooks::dx11::ImguiDx11Hooks;
 
 use toy_arms::utils::keyboard::{detect_keypress, VirtualKeyCode};
+use windows::Win32::Foundation::HINSTANCE;
 use crate::aion::structures::entity::c_entity::CEntity;
 use crate::aion_assistant::entity_detour::EntityDetour;
+use crate::aion_assistant::gui::Dx9HookExample;
 use crate::aion_assistant::threads::managers::entity_map::entity_map;
 use crate::aion_assistant::threads::managers::time_updater::time_updater;
 use crate::aion_assistant::threads::structures::{EntityMapVariables, GlobalVariables, TimeUpdaterVariables, VariablesContainer};
 
-pub(crate) fn main_loop(_hmodule_dll: *mut c_void) {
+pub(crate) unsafe fn main_loop(hmodule_dll: &HINSTANCE) {
 	// ! ---------- Passed vars ----------
 	// Globals
 	let mut is_running: bool = false;
@@ -55,28 +58,28 @@ pub(crate) fn main_loop(_hmodule_dll: *mut c_void) {
 		// desired_pattern: Some(String::from("48 8B 40 20 48 83 C4 20 5B C3 CC CC")),
 		// desired_pattern: Some(String::from("48 89 53 18 48 8B 40 20")),
 	);
-
-	// ! Done with variables
+	// ! ------ Done with containers ------
 
 	debug_println!("Starting main loop!");
+	initialize(&mut is_running, &mut entity_detour, &variables_container);
 	// debug_println!("Location: {:?}", std::env::current_dir());
 
 	loop {
 		unsafe {
-			debug_println!("Looping! HM: {} -- HM_Actual: {} -- Time: {:?}", centity_hashmap_raw.len(), centity_hashmap_actual.len(), *(variables_container.global_variables.lock().unwrap().current_time));
+			debug_println!("Looping! HM_Raw: {} -- HM_Actual: {} -- Time: {:?}", centity_hashmap_raw.len(), centity_hashmap_actual.len(), *(variables_container.global_variables.lock().unwrap().current_time));
 
 			// Sometimes get_active_window returns an error, so we must check before calling unwrap
 			let active_window = get_active_window();
 
 			// If this Aion window is the currently active window
 			if active_window.is_ok() && active_window.unwrap().process_id == std::process::id() as u64 {
-
 				if detect_keypress(VirtualKeyCode::VK_LEFT) {
-					if let Some(i) = CEntity::from_raw(0x40548800) {
-						debug_println!("test_me: {:?}", i.character.get_animation_speed());
-					} else {
-						debug_eprintln!("CEntity address given was invalid!");
-					}
+					// if let Some(i) = CEntity::from_raw(0x40548800) {
+					// 	debug_println!("test_me: {:?}", i.Character().get_animation_speed());
+					// } else {
+					// 	debug_eprintln!("CEntity address given was invalid!");
+					// }
+
 
 					// let lua = Lua::new();
 					//
@@ -119,27 +122,27 @@ pub(crate) fn main_loop(_hmodule_dll: *mut c_void) {
 
 	debug_println!("Main loop ended!");
 
+	// testy.unhook();
 	debug_println!("Threads ended!");
 }
 
-unsafe fn initialize(is_running: &mut bool, detour: &mut EntityDetour, variables_container: &VariablesContainer) {
+
+unsafe fn initialize(is_running: &mut bool, entity_detour: &mut EntityDetour, variables_container: &VariablesContainer) {
 	*is_running = true;
 
-	debug_println!("Initializing thread...");
+	debug_println!("Initializing detour...");
+	// (*entity_detour).initialize();
 
-	(*detour).initialize();
+	debug_println!("Initializing gui...");
+
+	// std::thread::spawn(|| {
+		let gui_hook: Box<dyn Hooks> = Dx9HookExample::new().into_hook::<ImguiDx11Hooks>();
+		gui_hook.hook();
+		hudhook::lifecycle::global_state::set_hooks(gui_hook);
+	// });
 
 	debug_println!("Initializing threads...");
-
-	initialize_threads(&variables_container);
-
-	// let hooks: Box<dyn hooks::Hooks> = Dx9HookExample::new().into_hook::<ImguiDx9Hooks>();
-	//
-	// unsafe {
-	// 	hooks.hook();
-	// }
-	//
-	// hudhook::lifecycle::global_state::set_hooks(hooks);
+	// initialize_threads(&variables_container);
 
 
 	// let game_hmodule_wrapped = get_module_handle("Game.dll");
@@ -210,30 +213,11 @@ unsafe fn initialize_threads(variables_container: &VariablesContainer) {
 	std::thread::spawn(move || { entity_map(entity_map_variables); });
 }
 
-unsafe fn terminate(is_running: &mut bool, detour: &mut EntityDetour) {
+unsafe fn terminate(is_running: &mut bool, entity_detour: &mut EntityDetour) {
 	debug_println!("Terminating...");
 
-	(*detour).terminate();
 	*is_running = false;
+	// (*entity_detour).terminate();
 
 	debug_println!("Terminated.");
 }
-
-// fn wait_and_get_module(module_name: &str) -> Option<Module> {
-// 	debug_println!("Waiting for {}...", module_name);
-//
-// 	let returned_module: Option<Module>;
-//
-// 	for _ in 0..60 {
-// 		returned_module = Module::from_name(module_name);
-//
-// 		if returned_module.is_some() {
-// 			debug_println!("'{}' handle = {:?}", module_name, returned_module.unwrap().handle as usize);
-// 			return returned_module;
-// 		}
-//
-// 		std::thread::sleep(std::time::Duration::from_secs(1));
-// 	}
-//
-// 	return None;
-// }
