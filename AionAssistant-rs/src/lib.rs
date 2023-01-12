@@ -1,4 +1,3 @@
-// #![feature(once_cell)] // Required for Lazy_Lock experimental feature
 #![feature(asm_const)]
 
 mod lib_runner;
@@ -8,12 +7,10 @@ mod aion;
 use std::error::Error;
 use std::ffi::c_void;
 use debug_print::{debug_eprintln, debug_println};
-use hudhook::reexports::{DLL_PROCESS_ATTACH, FreeConsole};
-use msgbox::IconType;
+use hudhook::reexports::DLL_PROCESS_ATTACH;
 use windows::Win32::Foundation::HINSTANCE;
-use windows::Win32::System::Console::{AllocConsole, SetConsoleTitleA};
+use windows::Win32::System::Console::{AllocConsole, FreeConsole, SetConsoleTitleA};
 use windows::Win32::System::LibraryLoader::{DisableThreadLibraryCalls, FreeLibraryAndExitThread};
-use windows::Win32::System::Threading::{CreateThread, THREAD_CREATION_FLAGS};
 
 /*
     Useful sources:
@@ -32,17 +29,18 @@ use windows::Win32::System::Threading::{CreateThread, THREAD_CREATION_FLAGS};
     https://stackoverflow.com/questions/40406225/how-to-add-parameters-to-a-running-process-or-exe-by-default
  */
 
-fn dll_attach(hmodule_dll: *mut c_void) -> Result<(), Box<dyn Error>> {
-	lib_runner::main_loop(hmodule_dll);
+fn dll_attach(hmodule_dll: &HINSTANCE) -> Result<(), Box<dyn Error>> {
+	unsafe { lib_runner::main_loop(hmodule_dll); }
 
 	// Return OK as main_loop has ended.
 	Ok(())
 }
 
 // Wrapper which has to be unsafe to use and also depends on the system's own calling methodology
-extern "system" fn dll_attach_wrapper(base: *mut c_void) -> u32 {
+extern "system" fn dll_attach_wrapper(hmodule_dll: &HINSTANCE) -> u32 {
+
 	// make sure that when attached, it doesn't fuck us over somehow (thru panicking)
-	match std::panic::catch_unwind(|| dll_attach(base)) {
+	match std::panic::catch_unwind(|| dll_attach(hmodule_dll)) {
 		Err(e) => {
 			debug_eprintln!("`dll_attach` has panicked: {:#?}", e);
 		}
@@ -57,7 +55,6 @@ extern "system" fn dll_attach_wrapper(base: *mut c_void) -> u32 {
 				debug_eprintln!("Error!");
 				debug_eprintln!("Error!");
 				debug_eprintln!("`dll_attach` returned an Err: {:#?}", e);
-				msgbox::create("Title", &*e.to_string(), IconType::Error).unwrap();
 				std::thread::sleep(std::time::Duration::from_secs(5));
 			}
 		},
@@ -65,43 +62,41 @@ extern "system" fn dll_attach_wrapper(base: *mut c_void) -> u32 {
 
 	debug_println!("Detaching!!");
 	std::thread::sleep(std::time::Duration::from_secs(2));
+
+	hudhook::lifecycle::eject();
+
+	// We still manually free the console, library and then exit after eject()
+	// because we never gave HUDHook's eject our HModule via global_state
 	unsafe {
 		// Detach the console, free the lib and exit this thread.
 		FreeConsole();
-		FreeLibraryAndExitThread(HINSTANCE(base as isize), 1);
+		FreeLibraryAndExitThread(*hmodule_dll, 0);
 	}
 }
 
 #[no_mangle] // call it "DllMain" in the compiled DLL
-pub extern "stdcall" fn DllMain(hmodule_dll: HINSTANCE, fdw_reason: u32, _lpv_reserved: *mut c_void) -> i32 {
+pub unsafe extern "stdcall" fn DllMain(hmodule_dll: HINSTANCE, fdw_reason: u32, _lpv_reserved: *mut c_void) -> i32 {
 	if fdw_reason == DLL_PROCESS_ATTACH { // DLL_PROCESS_ATTACH == 1
-		hudhook::lifecycle::global_state::set_module(hudhook::reexports::HINSTANCE(hmodule_dll.0));
+		// Create debug terminal if in debug mode
+		if cfg!(debug_assertions) {
+			AllocConsole();
 
-		unsafe {
-			// Create debug terminal if in debug mode
-			if cfg!(debug_assertions) {
-				AllocConsole();
+			// Set console title
+			SetConsoleTitleA(windows::s!("AionAssistant-Rust dbg console"));
+		}
 
-				// Set console title
-				SetConsoleTitleA(windows::s!("AionAssistant-Rust dbg console"));
-			}
+		debug_println!("AionAssistant-Rust injected!");
 
-			debug_println!("AionAssistant-Rust injected!");
-
-			// TODO: What does this do exactly?
+		// TODO: What does this do exactly?
 			DisableThreadLibraryCalls(hmodule_dll);
 
-			// Create thread.  TODO: Does this create a leaking handle?
-			CreateThread(
-				Some(0 as _),
-				0,
-				Some(dll_attach_wrapper),
-				Some(hmodule_dll.0 as *const c_void),
-				THREAD_CREATION_FLAGS(0),
-				Some(0 as _),
-			).unwrap();
-		}
-		debug_println!("AionAssistant-Rust finished!");
+		// Create thread.  TODO: Does this create a leaking handle?
+		std::thread::spawn(move || {
+			dll_attach_wrapper(&hmodule_dll);
+		});
+
+
+		debug_println!("AionAssistant-Rust finished injecting!");
 	}
 
 	true as i32
