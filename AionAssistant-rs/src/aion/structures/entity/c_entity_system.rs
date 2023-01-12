@@ -1,5 +1,4 @@
-use debug_print::debug_println;
-use toy_arms::internal::{cast, GameObject};
+use toy_arms::internal::GameObject;
 use toy_arms::derive::GameObject;
 
 #[derive(GameObject)]

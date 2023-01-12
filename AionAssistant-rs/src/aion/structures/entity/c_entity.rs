@@ -7,12 +7,8 @@ pub(crate) struct CEntity {
 	pub(crate) base: *mut u64,
 	// Denote the base address of LocalPlayer to use it later in get_health() function.
 	assigned_type: u64,
-	pub(crate) character: CharacterObject,
+	character: CharacterObject,
 }
-
-// pub(crate) trait AionAddress {
-// 	fn is_valid(&self) -> bool;
-// }
 
 impl CEntity {
 	// Constructor-ish function
@@ -86,15 +82,9 @@ impl CEntity {
 		return true;
 	}
 
-	pub fn character_object(&self) -> &CharacterObject {
+	pub fn Character(&self) -> &CharacterObject {
 		&self.character
 	}
-
-	// pub(crate) unsafe fn get_character_object(&mut self) -> &mut CharacterObject {
-	// 	// *cast!(*(self.base) + 0x2C0, CharacterObject)
-	// 	// CharacterObject::from_raw(self.get_value(0x2C0), self)
-	// 	&mut self.character_object
-	// }
 }
 
 // impl PartialEq for CEntity {
