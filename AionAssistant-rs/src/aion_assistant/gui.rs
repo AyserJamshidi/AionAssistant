@@ -1,52 +1,40 @@
-use debug_print::debug_println;
 use hudhook::hooks::{ImguiRenderLoop, ImguiRenderLoopFlags};
 use hudhook::renderers::imgui_dx12::imgui;
-use hudhook::renderers::imgui_dx12::imgui::{Condition, Window};
-use windows::Win32::UI::Input::KeyboardAndMouse::{GetAsyncKeyState, VK_RSHIFT};
+use hudhook::renderers::imgui_dx12::imgui::Condition;
 
-enum UiState {
-	MenuOpen,
-	Closed,
-	Hidden,
-}
-
-pub(crate) struct Dx9HookExample {
-	ui_state: UiState,
-}
+pub(crate) struct Dx9HookExample {}
 
 impl Dx9HookExample {
+    pub(crate) fn new() -> Self {
+        Dx9HookExample {}
+    }
 
-	pub(crate) fn new() -> Self {
-		debug_println!("Initializing imGui");
-		Dx9HookExample {
-			ui_state: UiState::Closed,
+    pub(crate) fn player_tab(&mut self, ui: &imgui::Ui) {
+        if let Some(_) = ui.tab_item("Player") {
+            ui.text("Hello Player!");
+            if ui.is_item_hovered() {
+                ui.tooltip_text("text");
+            }
+        }
+    }
+
+	pub(crate) fn target_tab(&mut self, ui: &imgui::Ui) {
+		if let Some(_) = ui.tab_item("Target") {
+			ui.text("Hello Target!");
 		}
-	}
-
-	fn render_visible(&mut self, ui: &mut imgui::Ui, flags: &ImguiRenderLoopFlags) {
-		Window::new("Hello world").size([300.0, 110.0], Condition::FirstUseEver).build(ui, || {
-			ui.text("Hello world!");
-			ui.text("こんにちは世界！");
-			ui.text("This...is...imgui-rs!");
-			ui.separator();
-			let mouse_pos = ui.io().mouse_pos;
-			ui.text(format!("Mouse Position: ({:.1},{:.1})", mouse_pos[0], mouse_pos[1]));
-		});
 	}
 }
 
+// Menu Customization: https://www.youtube.com/watch?v=iOQ7ZrNQLuI
 impl ImguiRenderLoop for Dx9HookExample {
-	fn render(&mut self, ui: &mut imgui::Ui, flags: &ImguiRenderLoopFlags) {
-		let rshift = unsafe { GetAsyncKeyState(VK_RSHIFT.0 as _) < 0 };
-
-		if flags.focused {
-			// TODO: Set Smooth Background to 1 (No Interaction)
-			self.ui_state = match (&self.ui_state, rshift) {
-				(UiState::Hidden, _) => UiState::Closed,
-				(_, true) => UiState::Hidden,
-				(UiState::MenuOpen, _) => UiState::Closed,
-				(UiState::Closed, _) => UiState::MenuOpen,
-			};
-		}
-	}
+    fn render(&mut self, ui: &mut imgui::Ui, _flags: &ImguiRenderLoopFlags) {
+        ui.window("##main")
+            .size([320., 200.], Condition::Always)
+            .build(|| {
+                if let Some(_i) = ui.tab_bar("##tab_bar") {
+					self.player_tab(ui);
+					self.target_tab(ui);
+                }
+            });
+    }
 }
