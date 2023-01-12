@@ -84,7 +84,7 @@ impl EntityDetour {
 	}
 }
 
-/// Stores <b>CEntity address</b> and the <b>current time</b> in a hashmap.
+/// Stores **CEntity address** and **current time** in a hashmap.
 /// The current time will be used to know the last time an entity was updated.
 /// This is required to filter out useless entities from the hashmap.
 extern "stdcall" fn entity_detour_function() {
@@ -92,7 +92,7 @@ extern "stdcall" fn entity_detour_function() {
 
 	// For some reason, we must access the hashmap via this variable, otherwise
 	// accessing it directly will cause RAX to be modified
-	let entity_hashmap = (unsafe { &mut *ENTITY_HASHMAP_PTR });
+	let entity_hashmap = unsafe { &mut *ENTITY_HASHMAP_PTR };
 
 	unsafe {
 		// Store rax into entity_address
@@ -111,7 +111,6 @@ extern "stdcall" fn entity_detour_function() {
 		);
 
 		// Insert entity_address into hashmap
-		// (*ENTITY_HASHMAP_PTR).insert(entity_address, 0);
 		entity_hashmap.insert(entity_address, *CURRENT_TIME_PTR);
 
 		// Restore registries
