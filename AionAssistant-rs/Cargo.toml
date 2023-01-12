@@ -1,6 +1,6 @@
 [package]
 name = "AionAssistant"
-version = "156.0.0"
+version = "448.0.0"
 authors = ["ME <ME@users.asdf.github.com>"]
 edition = "2021"
 
@@ -11,42 +11,25 @@ crate-type = ["cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-#libc = { version = "0.2.138", features = ["use_std", "extra_traits"] }
 #getset = "0.1.2"
 debug_print = "1.0.0"
 once_cell = "1.16.0"
-hudhook = "0.3.0"
-msgbox = "0.7.0"
-#libloading = "0.7.4"
+hudhook = { version = "0.4.0", git = "https://github.com/veeenu/hudhook", branch = "main" }
+# hudhook = { version = "0.4.0", path = "C:\\Users\\Ace\\CLionProjects\\hudhook" }
 active-win-pos-rs = "0.7.1"
+mlua = { version = "0.8.7", features = ["lua54", "vendored"] }
 #pelite = { version = "0.10.0", git = "https://github.com/CasualX/pelite", branch = "master" }
-#mlua = { version = "0.8.6", features = ["lua54", "vendored"] }
-mlua = { version = "0.8.6", git = "https://github.com/khvzak/mlua", features = ["lua54", "vendored"] }
 
 # Game hacking related dependencies
 toy-arms = { version = "0.9.4", git = "https://github.com/pseuxide/toy-arms" }
 detour = { git = "https://github.com/veeenu/detour-rs" }
-
-[dependencies.windows]
-version = "0.43.0"
-git = "https://github.com/microsoft/windows-rs"
-branch = "master"
-features = [
+windows = { version = "0.43.0", features = [
     "Win32_Foundation",
     "Win32_System_Console",
     "Win32_Security",
     "Win32_System_LibraryLoader",
     "Win32_System_Threading",
     "Win32_UI_Input_KeyboardAndMouse",
-]
-
-#[dependencies.winapi]
-#version = "0.3.9"
-#features = [
-#    "std",
-#    "everything",
-#    "minwindef",
-#    "consoleapi",
-#    "wincon",
-#    "libloaderapi"
-#]
+]}
+#git = "https://github.com/microsoft/windows-rs"
+#branch = "master"
